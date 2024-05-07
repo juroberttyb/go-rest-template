@@ -25,20 +25,56 @@ func NewOrder(c store.Order, q mq.MQ) Order {
 	}
 }
 
-func (s *orderSvc) New(ctx context.Context, userID, kickstartID string, email *string) error {
-	if err := s.c.New(ctx, userID, kickstartID, email); err != nil {
-		logging.Errorw(ctx, "attend kickstart failed", "err", err, "kickstartID", kickstartID, "userID", userID)
+func (s *orderSvc) New(ctx context.Context, userID, orderID string, email *string) error {
+	if err := s.c.New(ctx, userID, orderID, email); err != nil {
+		logging.Errorw(ctx, "attend order failed", "err", err, "orderID", orderID, "userID", userID)
 		return err
 	}
 	return nil
 }
 
-func (s *orderSvc) Get(ctx context.Context, userID, kickstartID string) (*models.Order, error) {
-	kickstart, err := s.c.Get(ctx, kickstartID)
+func (s *orderSvc) Take(ctx context.Context, userID, orderID string, email *string) error {
+	if err := s.c.New(ctx, userID, orderID, email); err != nil {
+		logging.Errorw(ctx, "attend order failed", "err", err, "orderID", orderID, "userID", userID)
+		return err
+	}
+
+	go func(ctx context.Context) {
+		// send email to user
+		go func(ctx context.Context) {
+			if err := s.q.Send("mail", struct {
+				Address string
+				Content string
+			}{
+				Address: "user@gmail.com",
+				Content: "your order has been fulfilled",
+			}); err != nil {
+				logging.Errorw(ctx, "send email failed", "err", err)
+			}
+		}(ctx)
+
+		// send sms message to user
+		go func(ctx context.Context) {
+			if err := s.q.Send("sms", struct {
+				Number  string
+				Content string
+			}{
+				Number:  "0911122233",
+				Content: "your order has been fulfilled",
+			}); err != nil {
+				logging.Errorw(ctx, "send sms failed", "err", err)
+			}
+		}(ctx)
+	}(ctx)
+	return nil
+}
+
+func (s *orderSvc) Get(ctx context.Context, userID, orderID string) (*models.Order, error) {
+	order, err := s.c.Get(ctx, orderID)
 	if err != nil {
 		return nil, err
 	}
-	return kickstart, nil
+	return order, nil
 }
 
 func (s *orderSvc) GetOrders(ctx context.Context, userID string, next string, count int, filter models.OrderStatus) ([]*models.Order, string, error) {
@@ -50,51 +86,51 @@ func (s *orderSvc) GetOrders(ctx context.Context, userID string, next string, co
 	limit := 500
 	switch filter {
 	case models.Attended:
-		cacheKey = fmt.Sprintf("get_kickstarts.attended.%s", userID)
+		cacheKey = fmt.Sprintf("get_orders.attended.%s", userID)
 		f = func() ([]*models.Order, error) {
-			logging.Debug(ctx, "actually getting attending kickstarts")
+			logging.Debug(ctx, "actually getting attending orders")
 			return s.c.GetMyOrders(ctx, userID, limit, false)
 		}
 	case models.Attending:
-		logging.Debug(ctx, "getting attending kickstarts")
-		cacheKey = fmt.Sprintf("get_kickstarts.attending.%s", userID)
+		logging.Debug(ctx, "getting attending orders")
+		cacheKey = fmt.Sprintf("get_orders.attending.%s", userID)
 		f = func() ([]*models.Order, error) {
-			logging.Debug(ctx, "actually getting attending kickstarts")
+			logging.Debug(ctx, "actually getting attending orders")
 			return s.c.GetMyOrders(ctx, userID, limit, true)
 		}
 	default:
-		cacheKey = "get_kickstarts"
+		cacheKey = "get_orders"
 		f = func() ([]*models.Order, error) {
 			return s.c.GetOrders(ctx, limit)
 		}
 	}
 
-	var kickstarts []*models.Order
-	if err := cache.Get(ctx, cacheKey, &kickstarts); err == nil {
-		logging.Infow(ctx, "got kickstarts from cache")
-		if kickstarts == nil { // if last get returns [], it will be cached as null, conerting for ease of frontend integration
-			kickstarts = []*models.Order{}
+	var orders []*models.Order
+	if err := cache.Get(ctx, cacheKey, &orders); err == nil {
+		logging.Infow(ctx, "got orders from cache")
+		if orders == nil { // if last get returns [], it will be cached as null, conerting for ease of frontend integration
+			orders = []*models.Order{}
 		}
 	} else if err == cache.ErrorNotFound {
-		logging.Infow(ctx, "get kickstarts response not found in cache", "err", err)
+		logging.Infow(ctx, "get orders response not found in cache", "err", err)
 
-		kickstarts, err = f()
+		orders, err = f()
 		if err != nil {
 			return nil, "", err
 		}
-		if err := cache.SetWithTTL(ctx, cacheKey, kickstarts, time.Minute); err != nil {
-			logging.Errorw(ctx, "set kickstarts cache failed", "err", err)
+		if err := cache.SetWithTTL(ctx, cacheKey, orders, time.Minute); err != nil {
+			logging.Errorw(ctx, "set orders cache failed", "err", err)
 			return nil, "", err
 		}
 	} else {
-		logging.Errorw(ctx, "unexpected error while getting kickstarts from cache", "err", err)
+		logging.Errorw(ctx, "unexpected error while getting orders from cache", "err", err)
 		return nil, "", err
 	}
 
 	if next != "" {
-		for i, kickstart := range kickstarts {
-			if kickstart.ID == next {
-				kickstarts = kickstarts[i:]
+		for i, order := range orders {
+			if order.ID == next {
+				orders = orders[i:]
 				break
 			}
 		}
@@ -102,14 +138,15 @@ func (s *orderSvc) GetOrders(ctx context.Context, userID string, next string, co
 
 	// prepare next cursor
 	next = ""
-	if len(kickstarts) > count { // more elements available
-		next = kickstarts[count].ID
-		kickstarts = kickstarts[:count]
+	if len(orders) > count { // more elements available
+		next = orders[count].ID
+		orders = orders[:count]
 	}
-	return kickstarts, next, nil
+
+	return orders, next, nil
 }
 
 // this cloud be placed under service package as aggregator package
-func aggregateOrders(ctx context.Context, kickstarts []*models.Order, attendingIDs []string, attendedIDs []string) error {
+func aggregateOrders(ctx context.Context, orders []*models.Order) error {
 	return nil
 }
