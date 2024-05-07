@@ -1,0 +1,7 @@
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: ingress-kickstart-dev-cert
+spec:
+  domains:
+    - kickstart-dev.gcp_project_name.tw

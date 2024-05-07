@@ -1,0 +1,47 @@
+name: Test and Build
+
+on: push
+  push:
+    branches: ["dev", "stage", "master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  unit-test: 
+    runs-on: ubuntu-latest
+    steps:
+      - name: pulling git repo
+        uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21' # The Go version to download (if necessary) and use.
+      - name: unit test
+        run: |
+          make unit-test
+  integration-test: 
+    needs: [unit-test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: pulling git repo
+        uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21' # The Go version to download (if necessary) and use.
+      - name: integration test
+        run: |
+          make integration-test
+  deploy: 
+    needs: [integration-test]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    steps:
+      - name: pulling git repo
+        uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21' # The Go version to download (if necessary) and use.
+      - name: build image
+        run: |
+          make image
