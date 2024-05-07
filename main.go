@@ -95,7 +95,7 @@ func main() {
 		},
 		Rabbitmq: &rabbitmq.Config{
 			ProjectName:     config.GetString("PROJECT_NAME"), // FIXME: need to add a listener at mq-svc to listen and handle this PROJECT_NAME's routing key
-			RabbitmqConnURL: "amqps://zybsafyg:gik8pM6R_3FZv6EUQHOPchouyLqO9sj5@mustang.rmq.cloudamqp.com/zybsafyg",
+			RabbitmqConnURL: config.GetString("RABBITMQ_CONN_URL"),
 		},
 	})
 	defer mq.Finalize()
