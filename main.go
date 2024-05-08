@@ -63,13 +63,13 @@ func main() {
 	// Setup cache module
 	//FIXME set it to production for testing purpose
 	cacheType := cache.TypeLocal
-	prefix := "mp-dev"
+	prefix := "local-dev"
 	redisURL := "localhost:6379"
 
 	if config.GetBool("PRODUCTION_ENVIRONMENT") {
 		cacheType = cache.TypeRedis
 		redisURL = "10.49.162.163:6379"
-		prefix = "kickstart"
+		prefix = config.GetString("SERVICE_NAME")
 	}
 	cache.Initialize(&cache.Config{
 		Type:     cacheType,
@@ -86,16 +86,15 @@ func main() {
 	mq.Initialize(ctx, &mq.Config{
 		Pubsub: &pubsubLite.Config{
 			ProjectID:    config.GetString("PROJECT_ID"),
-			RegionOrZone: "asia-east1",
+			RegionOrZone: config.GetString("REGION"),
 			Topics: map[string]string{
-				"svc-action": "",
-				"notif":      "",
-				"consume":    "consume",
+				"mail": "mail",
+				"sms":  "sms",
 			},
 		},
 		Rabbitmq: &rabbitmq.Config{
 			ProjectName:     config.GetString("PROJECT_NAME"), // FIXME: need to add a listener at mq-svc to listen and handle this PROJECT_NAME's routing key
-			RabbitmqConnURL: "amqps://zybsafyg:gik8pM6R_3FZv6EUQHOPchouyLqO9sj5@mustang.rmq.cloudamqp.com/zybsafyg",
+			RabbitmqConnURL: config.GetString("RABBITMQ_CONN_URL"),
 		},
 	})
 	defer mq.Finalize()

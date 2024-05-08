@@ -20,6 +20,12 @@ $ make run
 $ make local-dev-down
 ```
 
+## Resouce
+* (postman)[./tradebook.postman_collection.json] file is included for trying the api out
+
+## API DOC
+* Local Dev: http://localhost:8000/docs/index.html
+
 ## package structure
 ```
 api -> service -> store -> implementations (database, encryption...)
@@ -28,5 +34,9 @@ api -> service -> store -> implementations (database, encryption...)
  +----> models <----+
 ```
 
+## FIXME
+* mutex should not only be on codebase level, but also should be on kubernete level to ensure no multitple pods modifying the orders at the same time
+
 ## todo
-* Update to use websocket isntead of REST
+* Update to use websocket instead of REST
+* Logging library should consider whether this is performance critical to change log format

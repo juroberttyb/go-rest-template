@@ -10,7 +10,7 @@ else
 endif
 
 export
-PROJECT_ID=GCP_PROJECT_ID
+PROJECT_ID=gcp_project_id
 SERVICE_NAME=kickstart
 BINARY_NAME=app
 GITHUB_ORGANIZATION=GITHUB_ORGANIZATION_NAME
@@ -28,7 +28,7 @@ DEPLOY_NAME=kickstart
 CLUSTER_NAME=PROD_CLUSTER_NAME
 REGION=PROD_CLUSTER_REGION
 
-.PHONY: clean compose-up doc deps run deploy
+.PHONY: clean doc deps run deploy
 
 ${BINARY_NAME}:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /bin/${BINARY_NAME} -ldflags "$(LDFLAGS)" ./main.go

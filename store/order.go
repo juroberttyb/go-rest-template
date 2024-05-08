@@ -3,13 +3,15 @@ package store
 import (
 	"context"
 	"database/sql"
-	"fmt"
+	"errors"
 	"strings"
 
+	"github.com/A-pen-app/kickstart/database"
 	"github.com/A-pen-app/kickstart/models"
 	"github.com/A-pen-app/logging"
 	"github.com/A-pen-app/tracing"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type orderStore struct {
@@ -23,268 +25,173 @@ func NewOrder(db *sqlx.DB) Order {
 	}
 }
 
-func (s *orderStore) New(ctx context.Context, userID, kickstartID string, email *string) error {
+func (s *orderStore) GetLiveOrders(ctx context.Context, action models.OrderAction) ([]*models.Order, error) {
+	defer tracing.Start(ctx, "store.get.orders.live").End()
+
+	orders := []*models.Order{}
 	query := `
-	INSERT INTO public.user_kickstart_relation (
-		user_id,
-		kickstart_id,
-		email,
-		created_at,
-		updated_at
-	)
-	VALUES (
-		?,
-		?,
-		?,
-		now()::timestamp(0),
-		now()::timestamp(0)
-	) ON CONFLICT 
-	(
-		user_id,
-		kickstart_id
-	) DO NOTHING`
+		SELECT 
+			id,
+			action,
+			price,
+			amount,
+			created_at
+		FROM public.order
+		WHERE 
+	`
+	conditions := []string{
+		"action = ?",
+	}
 	values := []interface{}{
-		userID,
-		kickstartID,
-		email,
+		action,
+	}
+	query = query + strings.Join(conditions, " AND ") + " ORDER BY created_at DESC"
+
+	switch action {
+	case models.Buy:
+		query = query + ", price ASC" // (latest order, highest price)
+	case models.Sell:
+		query = query + ", price DESC" // (latest order, lowest price)
+	default:
+		err := errors.New("invalid order action")
+		logging.Errorw(ctx, "store get live orders failed", "err", err)
+		return nil, err
+	}
+
+	query = s.db.Rebind(query)
+	if err := s.db.Select(&orders, query, values...); err != nil {
+		if err == sql.ErrNoRows {
+			return orders, nil
+		}
+		logging.Errorw(ctx, "store get orders failed", "err", err)
+		return nil, parseError(err)
+	}
+	return orders, nil
+}
+
+func (s *orderStore) Make(ctx context.Context, action models.OrderAction, price, amount int) error {
+	query := `
+		INSERT INTO public.order (
+			action,
+			price,
+			amount
+		)
+		VALUES (
+			?,
+			?,
+			?
+		)
+	`
+	values := []interface{}{
+		action,
+		price,
+		amount,
 	}
 	query = s.db.Rebind(query)
 	if _, err := s.db.Exec(query, values...); err != nil {
-		logging.Errorw(ctx, "attend kickstart failed", "err", err, "userID", userID, "kickstartID", kickstartID)
+		logging.Errorw(ctx, "store make order failed", "err", err)
 		return parseError(err)
 	}
 	return nil
 }
 
-func (s *orderStore) Get(ctx context.Context, kickstartID string) (*models.Order, error) {
-	kickstart := models.Order{}
-	query := `
-	SELECT 
-		id,
-		content,
-		created_at, 
-		updated_at,
-		ending_at,
-		speaker,
-		point,
-		apply_info,
-		charging_fee,
-		participant_count,
-		picture_url,
-		max_participant_count,
-		title,
-		is_deleted,
-		is_active,
-		creator_id,
-		tags,
-		awards,
-		coins
-	FROM public.kickstart
-	WHERE 
-		id=? 
-		AND 
-		is_deleted=false
-	`
-	values := []interface{}{
-		kickstartID,
-	}
-	query = s.db.Rebind(query)
-	if err := s.db.QueryRowx(query, values...).StructScan(&kickstart); err != nil {
-		logging.Errorw(ctx, "get kickstart failed", "err", err, "kickstartID", kickstartID)
-		return nil, parseError(err)
-	}
-	return &kickstart, nil
-}
+// FIXME: currently only buy action is supported
+func (s *orderStore) Take(ctx context.Context, action models.OrderAction, amount int) (int, error) {
+	var latestPrice int
 
-func (s *orderStore) GetOrders(ctx context.Context, limit int) ([]*models.Order, error) {
-	defer tracing.Start(ctx, "store.get.kickstarts").End()
-
-	kickstarts := []*models.Order{}
-	query := `
-	SELECT 
-		id,
-		content,
-		created_at, 
-		updated_at,
-		hosting_at,
-		ending_at,
-		speaker,
-		point,
-		apply_info,
-		charging_fee,
-		location,
-		participant_count,
-		picture_url,
-		max_participant_count,
-		title,
-		is_deleted,
-		is_active,
-		creator_id,
-		tags,
-		contact,
-		hoster,
-		url,
-		awards,
-		coins
-	FROM public.kickstart
-	WHERE 
-	`
-	conditions := []string{
-		"is_deleted=false",
-		"is_active=true",
-	}
-	values := []interface{}{}
-	query = query + strings.Join(conditions, " AND ") + " ORDER BY hosting_at DESC LIMIT ?"
-	values = append(values, limit)
-
-	query = s.db.Rebind(query)
-	if err := s.db.Select(&kickstarts, query, values...); err != nil {
-		logging.Errorw(ctx, "get kickstarts failed", "err", err)
-		return nil, parseError(err)
-	}
-	return kickstarts, nil
-}
-
-func (s *orderStore) GetMyOrders(ctx context.Context, uid string, limit int, isAttending bool) ([]*models.Order, error) {
-	defer tracing.Start(ctx, "store.get.my.kickstarts").End()
-
-	kickstarts := []*models.Order{}
-	query := `
-	SELECT 
-		id,
-		content,
-		created_at, 
-		updated_at,
-		hosting_at,
-		ending_at,
-		speaker,
-		point,
-		apply_info,
-		charging_fee,
-		location,
-		participant_count,
-		picture_url,
-		max_participant_count,
-		title,
-		is_deleted,
-		is_active,
-		creator_id,
-		tags,
-		contact,
-		hoster,
-		url,
-		awards,
-		coins
-	FROM public.kickstart m
-	WHERE 
-	`
-	conditions := []string{
-		`
-		EXISTS ( 
-			SELECT 1
-			FROM user_kickstart_relation umr
-			WHERE m.id = umr.kickstart_id
-			AND umr.user_id = ?
-		)
-		`,
-		"is_deleted=false",
-		"is_active=true",
-	}
-	if isAttending {
-		conditions = append(conditions, "hosting_at > now()::timestamp(0)")
-	} else {
-		conditions = append(conditions, "hosting_at < now()::timestamp(0)")
-	}
-	query = query + strings.Join(conditions, " AND ") + " ORDER BY hosting_at DESC LIMIT ?"
-
-	values := []interface{}{
-		uid,
-		limit,
-	}
-	logging.Debug(ctx, fmt.Sprintf("values %v", values))
-
-	query = s.db.Rebind(query)
-	if err := s.db.Select(&kickstarts, query, values...); err != nil {
-		logging.Errorw(ctx, "get kickstarts failed", "err", err)
-		return nil, parseError(err)
-	}
-	return kickstarts, nil
-}
-
-func (s *orderStore) GetOrderIDs(ctx context.Context, uid string, limit int, status models.OrderStatus) ([]string, error) {
-	defer tracing.Start(ctx, "store.get.attended.kickstarts").End()
-
-	kickstartIDs := []string{}
-	query := `
-	SELECT 
-		id
-	FROM public.kickstart m
-	WHERE 
-	`
-	conditions := []string{
-		`
-		EXISTS ( 
-			SELECT 1
-			FROM user_kickstart_relation umr
-			WHERE m.id = umr.kickstart_id
-			AND umr.user_id = ?
-		)
-		`,
-		"is_deleted=false",
-		"is_active=true",
-	}
-	switch status {
-	case models.Attending:
-		conditions = append(conditions, "hosting_at > now()::timestamp(0)")
-	case models.Attended:
-		conditions = append(conditions, "hosting_at < now()::timestamp(0)")
-	default:
-	}
-	query = query + strings.Join(conditions, " AND ") + " ORDER BY created_at DESC LIMIT ?"
-
-	values := []interface{}{
-		uid,
-		limit,
-	}
-	logging.Debug(ctx, fmt.Sprintf("values %v", values))
-
-	query = s.db.Rebind(query)
-	if err := s.db.Select(&kickstartIDs, query, values...); err != nil && err != sql.ErrNoRows {
-		logging.Errorw(ctx, "get kickstarts failed", "err", err)
-		return nil, parseError(err)
-	}
-	return kickstartIDs, nil
-}
-
-func (s *orderStore) GetIsAttended(ctx context.Context, uid, kickstartID string) (bool, error) {
-	defer tracing.Start(ctx, "store.get.kickstart.is_attended").End()
-
-	query := `
-		SELECT
-		EXISTS (
+	db := database.GetPostgres()
+	if err := database.Transaction(db, func(tx *sqlx.Tx) error {
+		orders := []*models.Order{}
+		query := `
 			SELECT 
-				1
-			FROM public.user_kickstart_relation
+				id,
+				price,
+				amount,
+				created_at
+			FROM public.order
 			WHERE 
+		`
+		conditions := []string{
+			"action = ?",
+		}
+		values := []interface{}{
+			models.Sell,
+		}
+		query = query + strings.Join(conditions, " AND ") + " ORDER BY created_at DESC, price ASC" // (latest order, lowest price)
+
+		query = tx.Rebind(query)
+		if err := tx.Select(&orders, query, values...); err != nil {
+			logging.Errorw(ctx, "store get orders failed", "err", err)
+			return parseError(err)
+		}
+
+		orderIDs := []string{}
+		// FIXME: currently this take orders until amount is 0, but if selling orders are not enough, it should be handled
+		for _, order := range orders {
+			if amount == 0 {
+				break
+			}
+			if order.Amount > amount {
+				query := `
+					UPDATE public.order
+					SET
+						amount=?
+					WHERE
+					id=?
+				`
+				values := []interface{}{
+					order.Amount - amount,
+					order.ID,
+				}
+				query = tx.Rebind(query)
+				if _, err := tx.Exec(query, values...); err != nil {
+					logging.Errorw(ctx, "store update order in take order failed", "err", err)
+					return parseError(err)
+				}
+				amount = 0
+				latestPrice = order.Price
+			} else {
+				orderIDs = append(orderIDs, order.ID)
+				amount = amount - order.Amount
+			}
+		}
+
+		if len(orderIDs) > 0 {
+			query := `
+				DELETE FROM public.order 
+				WHERE 
+				id = ANY(?)
+			`
+			values := []interface{}{
+				pq.StringArray(orderIDs),
+			}
+			query = tx.Rebind(query)
+			if _, err := tx.Exec(query, values...); err != nil {
+				logging.Errorw(ctx, "store delete taken orders failed", "err", err)
+				return parseError(err)
+			}
+		}
+		return nil
+	}); err != nil {
+		logging.Errorw(ctx, "store take order action failed", "err", err)
+		return 0, err
+	}
+	return latestPrice, nil
+}
+
+func (s *orderStore) Delete(ctx context.Context, orderID string) error {
+	query := `
+		DELETE FROM public.order 
+		WHERE 
+		id = ?
 	`
-	conditions := []string{
-		"is_deleted=false",
-		"user_id=?",
-		"kickstart_id=?",
-	}
-	query = query + strings.Join(conditions, " AND ")
-	query += `)` // ending ')' for EXISTS
-
 	values := []interface{}{
-		uid,
-		kickstartID,
+		orderID,
 	}
-
-	exist := false
 	query = s.db.Rebind(query)
-	if err := s.db.Get(&exist, query, values...); err != nil {
-		logging.Errorw(ctx, "get kickstarts failed", "err", err)
-		return false, parseError(err)
+	if _, err := s.db.Exec(query, values...); err != nil {
+		logging.Errorw(ctx, "store delete order failed", "err", err, "orderID", orderID)
+		return parseError(err)
 	}
-	return exist, nil
+	return nil
 }
