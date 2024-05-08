@@ -157,6 +157,34 @@ func (s *orderSvc) Make(ctx context.Context, action models.OrderAction, price, a
 		return err
 	}
 	s.BoardGuard.Unlock()
+
+	go func(ctx context.Context) {
+		// send email to user
+		go func(ctx context.Context) {
+			if err := s.q.Send("mail", struct {
+				Address string
+				Content string
+			}{
+				Address: "user@gmail.com",
+				Content: "your order has been created",
+			}); err != nil {
+				logging.Errorw(ctx, "send email failed", "err", err)
+			}
+		}(ctx)
+
+		// send sms message to user
+		go func(ctx context.Context) {
+			if err := s.q.Send("sms", struct {
+				Number  string
+				Content string
+			}{
+				Number:  "0911122233",
+				Content: "your order has been created",
+			}); err != nil {
+				logging.Errorw(ctx, "send sms failed", "err", err)
+			}
+		}(ctx)
+	}(ctx)
 	return nil
 }
 
