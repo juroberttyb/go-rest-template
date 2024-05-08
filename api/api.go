@@ -73,15 +73,15 @@ func createRouterAndGroup(prefix string) *gin.Engine {
 
 	pubsub := mq.GetPubsub()
 
-	kickstartStore := store.NewOrder(db)
+	orderStore := store.NewOrder(db)
 
-	kickstartSvc := service.NewOrder(kickstartStore, pubsub)
+	orderSvc := service.NewOrder(orderStore, pubsub)
 
 	// register routes
 	addDocRoutes(root)
 	addProbesRoutes(root)
 	addSystemRoutes(root)
-	addOrderRoutes(root, kickstartSvc)
+	addOrderRoutes(root, orderSvc)
 
 	return engine
 }

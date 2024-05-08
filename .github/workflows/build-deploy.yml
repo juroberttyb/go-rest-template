@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.22' # The Go version to download (if necessary) and use.
+          go-version: '1.22'
       - name: unit test
         run: |
           make unit-test
@@ -26,10 +26,13 @@ jobs:
         uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.22' # The Go version to download (if necessary) and use.
-      - name: integration test
+          go-version: '1.22'
+      - name: run services
         run: |
-          make integration-test
+          make local-dev-up
+      - name: integration test for database logics
+        run: |
+          make db-integration-test
   deploy: 
     needs: [integration-test]
     runs-on: ubuntu-latest
@@ -41,7 +44,7 @@ jobs:
         uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.22' # The Go version to download (if necessary) and use.
+          go-version: '1.22'
       - name: build image
         run: |
           make image
