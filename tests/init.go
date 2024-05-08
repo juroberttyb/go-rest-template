@@ -1,7 +1,7 @@
 package tests
 
 var (
-	BaseURL = "http://127.0.0.1:8000"
+	BaseURL = "http://localhost:8000"
 )
 
 func init() {

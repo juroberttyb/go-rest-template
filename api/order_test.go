@@ -24,7 +24,6 @@ func TestGetBoardIntegration(t *testing.T) {
 
 	req.Header.Set("Accept", "*/*")
 	req.Header.Set("Accept-Encoding", "gzip, deflate, br")
-	req.Header.Set("Authorization", "some_token")
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
