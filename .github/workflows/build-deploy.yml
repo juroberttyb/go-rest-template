@@ -32,7 +32,7 @@ jobs:
           make local-dev-up
       - name: run server
         run: |
-          screen -dm bash -c "make run;"
+          make run
       - name: integration test
         run: |
           make integration-test
