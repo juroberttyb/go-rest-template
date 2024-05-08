@@ -20,6 +20,12 @@ $ make run
 $ make local-dev-down
 ```
 
+## Resouce
+* (postman)[./tradebook.postman_collection.json] file is included for trying the api out
+
+## API DOC
+* Local Dev: http://localhost:8000/docs/index.html
+
 ## package structure
 ```
 api -> service -> store -> implementations (database, encryption...)

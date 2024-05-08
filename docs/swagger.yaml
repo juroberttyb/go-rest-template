@@ -38,19 +38,15 @@ definitions:
       action:
         allOf:
         - $ref: '#/definitions/models.OrderAction'
+        description: FIXME:user_id should be retrieved from the user's jwt token
         example: buy
       amount:
         example: 100
         minimum: 1
         type: integer
-      user_id:
-        description: FIXME:user_id should be retrieved from the user's jwt token
-        example: uuid
-        type: string
     required:
     - action
     - amount
-    - user_id
     type: object
   models.Order:
     properties:

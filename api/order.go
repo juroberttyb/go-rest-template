@@ -70,7 +70,7 @@ func (h *orderHandler) getBoard(ctx *gin.Context) {
 // FIXME: need to consider integer overflow here, for example price*amount > int max value
 // FIXME: should use fixed type in64 or int32 instead of int to avoid overflow
 type makeOrderBody struct {
-	Action models.OrderAction `form:"action" binding:"required" example:"buy"`
+	Action models.OrderAction `json:"action" binding:"required" example:"buy"`
 	Price  int                `json:"price" binding:"required,min=1" example:"10"`
 	Amount int                `json:"amount" binding:"required,min=1" example:"100"`
 }
@@ -106,8 +106,7 @@ func (h *orderHandler) make(ctx *gin.Context) {
 
 type takeOrderBody struct {
 	// FIXME:user_id should be retrieved from the user's jwt token
-	UserID string             `form:"user_id" binding:"required,uuid" example:"uuid"`
-	Action models.OrderAction `form:"action" binding:"required" example:"buy"`
+	Action models.OrderAction `json:"action" binding:"required" example:"buy"`
 	Amount int                `json:"amount" binding:"required,min=1" example:"100"`
 }
 
@@ -132,7 +131,6 @@ func (h *orderHandler) take(ctx *gin.Context) {
 		ctx.Request.Context(),
 		b.Action,
 		b.Amount,
-		b.UserID,
 	); err != nil {
 		handleError(ctx, err)
 		return

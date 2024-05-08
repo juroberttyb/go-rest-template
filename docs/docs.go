@@ -267,11 +267,11 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "action",
-                "amount",
-                "user_id"
+                "amount"
             ],
             "properties": {
                 "action": {
+                    "description": "FIXME:user_id should be retrieved from the user's jwt token",
                     "allOf": [
                         {
                             "$ref": "#/definitions/models.OrderAction"
@@ -283,11 +283,6 @@ const docTemplate = `{
                     "type": "integer",
                     "minimum": 1,
                     "example": 100
-                },
-                "user_id": {
-                    "description": "FIXME:user_id should be retrieved from the user's jwt token",
-                    "type": "string",
-                    "example": "uuid"
                 }
             }
         },

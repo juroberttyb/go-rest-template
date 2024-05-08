@@ -29,6 +29,7 @@ type Order struct {
 }
 
 type Board struct {
-	BuyOrders  []*Order `json:"buy_orders"`
-	SellOrders []*Order `json:"sell_orders"`
+	LatestPrice int      `json:"latest_price"`
+	BuyOrders   []*Order `json:"buy_orders"`
+	SellOrders  []*Order `json:"sell_orders"`
 }

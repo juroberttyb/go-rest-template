@@ -44,7 +44,7 @@ func initializeRouter() *gin.Engine {
 // @description				This service provides message broadcasting service for official accounts,
 // @description				it also supports audience filtering and performance reporting.
 // @version					v1
-// @host						kickstart.gcp_project_name.tw
+// @host					localhost:8000
 // @basePath					/
 // @schemes					http
 // @securityDefinitions.apiKey	Bearer

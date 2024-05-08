@@ -16,14 +16,18 @@ import (
 
 type orderSvc struct {
 	LatestPrice int
+	BoardGuard  sync.Mutex
 	c           store.Order
 	q           mq.MQ
 }
 
+const DEFAULT_PRICE int = 10
+
 // NewOrder returns an implementation of service.Order
 func NewOrder(c store.Order, q mq.MQ) Order {
 	return &orderSvc{
-		LatestPrice: 10,
+		LatestPrice: DEFAULT_PRICE,
+		BoardGuard:  sync.Mutex{},
 		c:           c,
 		q:           q,
 	}
@@ -91,9 +95,16 @@ func (s *orderSvc) GetBoard(ctx context.Context, boardType models.OrderBoardType
 	if err := cache.Get(ctx, cacheKey, &board); err == nil {
 		if board == nil { // if last get returns [], it will be cached as null, conerting for ease of frontend integration
 			board = &models.Board{
-				BuyOrders:  []*models.Order{},
-				SellOrders: []*models.Order{},
+				LatestPrice: s.LatestPrice,
+				BuyOrders:   []*models.Order{},
+				SellOrders:  []*models.Order{},
 			}
+		}
+		if board.BuyOrders == nil {
+			board.BuyOrders = []*models.Order{}
+		}
+		if board.SellOrders == nil {
+			board.SellOrders = []*models.Order{}
 		}
 	} else if err == cache.ErrorNotFound {
 		logging.Infow(ctx, "get orders response not found in cache", "err", err)
@@ -102,6 +113,7 @@ func (s *orderSvc) GetBoard(ctx context.Context, boardType models.OrderBoardType
 		if err != nil {
 			return nil, "", err
 		}
+		board.LatestPrice = s.LatestPrice
 
 		// FIXME: add Board aggregation
 		if err := aggregateBoard(ctx, board); err != nil {
@@ -127,20 +139,48 @@ func (s *orderSvc) GetBoard(ctx context.Context, boardType models.OrderBoardType
 }
 
 func (s *orderSvc) Make(ctx context.Context, action models.OrderAction, price, amount int) error {
+	if action == models.Buy && price >= s.LatestPrice {
+		err := fmt.Errorf("price to buy %d should not be lower than latest price %d", price, s.LatestPrice)
+		logging.Errorw(ctx, "service make order failed", "err", err)
+		return err
+	}
+	if action == models.Sell && price <= s.LatestPrice {
+		err := fmt.Errorf("price to sell %d should not be higher than latest price %d", price, s.LatestPrice)
+		logging.Errorw(ctx, "service make order failed", "err", err)
+		return err
+	}
+
+	s.BoardGuard.Lock()
 	// FIXME: should update to cache after make order
 	if err := s.c.Make(ctx, action, price, amount); err != nil {
 		logging.Errorw(ctx, "service make order failed", "err", err)
 		return err
 	}
+	s.BoardGuard.Unlock()
 	return nil
 }
 
-func (s *orderSvc) Take(ctx context.Context, action models.OrderAction, amount int, takerID string) error {
-	// FIXME: should update to cache after take order
-	if err := s.c.Take(ctx, action, amount, takerID); err != nil {
+func (s *orderSvc) Take(ctx context.Context, action models.OrderAction, amount int) error {
+	if action != models.Buy {
+		err := fmt.Errorf("currently, only buy action is supported, got %s", action)
 		logging.Errorw(ctx, "service take order failed", "err", err)
 		return err
 	}
+
+	// FIXME: should update to cache after take order
+	s.BoardGuard.Lock()
+	latestPrice, err := s.c.Take(ctx, action, amount)
+	if err != nil {
+		logging.Errorw(ctx, "service take order failed", "err", err)
+		return err
+	}
+	// in case orders are all taken
+	if latestPrice == 0 {
+		s.LatestPrice = DEFAULT_PRICE
+	} else {
+		s.LatestPrice = latestPrice
+	}
+	s.BoardGuard.Unlock()
 
 	go func(ctx context.Context) {
 		// send email to user
@@ -174,10 +214,12 @@ func (s *orderSvc) Take(ctx context.Context, action models.OrderAction, amount i
 
 func (s *orderSvc) Delete(ctx context.Context, orderID string) error {
 	// FIXME: should update to cache after delete order
+	s.BoardGuard.Lock()
 	if err := s.c.Delete(ctx, orderID); err != nil {
 		logging.Errorw(ctx, "attend order failed", "err", err, "orderID", orderID)
 		return err
 	}
+	s.BoardGuard.Unlock()
 	return nil
 }
 

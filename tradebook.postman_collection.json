@@ -1,0 +1,163 @@
+{
+	"info": {
+		"_postman_id": "108b5515-9d63-40f4-882e-329e725449dd",
+		"name": "tradebook",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19456855",
+		"_collection_link": "https://blue-satellite-826109.postman.co/workspace/apen~61b852c5-393c-4ca1-8a35-c38fa3b50042/collection/19456855-108b5515-9d63-40f4-882e-329e725449dd?action=share&source=collection_link&creator=19456855"
+	},
+	"item": [
+		{
+			"name": "make order",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwtToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"action\": \"sell\", \n    \"price\": 50,\n    \"amount\": 10\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8000/orders/make",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"orders",
+						"make"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "order",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwtToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8000/orders/785de069-ae1c-4e96-8a32-2c89f505d3f9",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"orders",
+						"785de069-ae1c-4e96-8a32-2c89f505d3f9"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "take order",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwtToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"action\": \"buy\", \n    \"amount\": 2\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8000/orders/take",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"orders",
+						"take"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "board",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwtToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8000/board?board_type=live",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"board"
+					],
+					"query": [
+						{
+							"key": "board_type",
+							"value": "live"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

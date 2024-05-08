@@ -11,6 +11,7 @@ import (
 	"github.com/A-pen-app/logging"
 	"github.com/A-pen-app/tracing"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type orderStore struct {
@@ -95,7 +96,9 @@ func (s *orderStore) Make(ctx context.Context, action models.OrderAction, price,
 }
 
 // FIXME: currently only buy action is supported
-func (s *orderStore) Take(ctx context.Context, action models.OrderAction, amount int, takerID string) error {
+func (s *orderStore) Take(ctx context.Context, action models.OrderAction, amount int) (int, error) {
+	var latestPrice int
+
 	db := database.GetPostgres()
 	if err := database.Transaction(db, func(tx *sqlx.Tx) error {
 		orders := []*models.Order{}
@@ -132,11 +135,13 @@ func (s *orderStore) Take(ctx context.Context, action models.OrderAction, amount
 				query := `
 					UPDATE public.order
 					SET
+						amount=?
 					WHERE
-					amount=?
+					id=?
 				`
 				values := []interface{}{
 					order.Amount - amount,
+					order.ID,
 				}
 				query = tx.Rebind(query)
 				if _, err := tx.Exec(query, values...); err != nil {
@@ -144,6 +149,7 @@ func (s *orderStore) Take(ctx context.Context, action models.OrderAction, amount
 					return parseError(err)
 				}
 				amount = 0
+				latestPrice = order.Price
 			} else {
 				orderIDs = append(orderIDs, order.ID)
 				amount = amount - order.Amount
@@ -157,7 +163,7 @@ func (s *orderStore) Take(ctx context.Context, action models.OrderAction, amount
 				id = ANY(?)
 			`
 			values := []interface{}{
-				orderIDs,
+				pq.StringArray(orderIDs),
 			}
 			query = tx.Rebind(query)
 			if _, err := tx.Exec(query, values...); err != nil {
@@ -167,10 +173,10 @@ func (s *orderStore) Take(ctx context.Context, action models.OrderAction, amount
 		}
 		return nil
 	}); err != nil {
-		logging.Errorw(ctx, "signup new user db request failed", "err", err)
-		return err
+		logging.Errorw(ctx, "store take order action failed", "err", err)
+		return 0, err
 	}
-	return nil
+	return latestPrice, nil
 }
 
 func (s *orderStore) Delete(ctx context.Context, orderID string) error {
