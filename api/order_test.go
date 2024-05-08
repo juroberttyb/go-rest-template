@@ -12,6 +12,10 @@ import (
 )
 
 func TestGetBoardIntegration(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping system integration test")
+	}
+
 	url := tests.BaseURL + "/board?board_type=live"
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
