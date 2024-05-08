@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.22' # The Go version to download (if necessary) and use.
+          go-version: '1.22'
       - name: unit test
         run: |
           make unit-test
@@ -26,7 +26,13 @@ jobs:
         uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.22' # The Go version to download (if necessary) and use.
+          go-version: '1.22'
+      - name: run services
+        run: |
+          make local-dev-up
+      - name: run server
+        run: |
+          screen -dm bash -c "make run;"
       - name: integration test
         run: |
           make integration-test
@@ -41,7 +47,7 @@ jobs:
         uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.22' # The Go version to download (if necessary) and use.
+          go-version: '1.22'
       - name: build image
         run: |
           make image
