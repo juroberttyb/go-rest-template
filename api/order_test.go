@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetBoardIntegration(t *testing.T) {
+func TestGetBoardAPIIntegration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping system integration test")
 	}
