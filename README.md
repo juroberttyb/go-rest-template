@@ -21,7 +21,7 @@ $ make local-dev-down
 ```
 
 ## Resouce
-* (postman)[./tradebook.postman_collection.json] file is included for trying the api out
+* [postman file](./tradebook.postman_collection.json) is included for trying the api out
 
 ## API DOC
 * Local Dev: http://localhost:8000/docs/index.html
