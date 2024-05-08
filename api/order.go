@@ -24,8 +24,8 @@ func addOrderRoutes(root *gin.RouterGroup, c service.Order) {
 	// FIXME: need to do pagination and filter, pagination should start from latest taker price and grow up and down
 	// FIXME: implement this get method
 	// g.GET(":order_id", h.get)
-	g.POST("", h.make)
-	g.PATCH("", h.take)
+	g.POST("make", h.make)
+	g.PATCH("take", h.take)
 	g.DELETE(":order_id", h.delete)
 }
 
