@@ -1,20 +1,30 @@
 basePath: /
 definitions:
-  api.attendReq:
-    properties:
-      email:
-        type: string
-      kickstart_id:
-        type: string
-    required:
-    - kickstart_id
-    type: object
   api.errorResp:
     properties:
       error:
         type: string
       request_id:
         type: string
+    type: object
+  api.makeOrderBody:
+    properties:
+      action:
+        allOf:
+        - $ref: '#/definitions/models.OrderAction'
+        example: buy
+      amount:
+        example: 100
+        minimum: 1
+        type: integer
+      price:
+        example: 10
+        minimum: 1
+        type: integer
+    required:
+    - action
+    - amount
+    - price
     type: object
   api.pageResp:
     properties:
@@ -23,80 +33,64 @@ definitions:
         example: next cursor value
         type: string
     type: object
-  models.Order:
+  api.takeOrderBody:
     properties:
-      apply_info:
-        type: string
-      awards:
+      action:
+        allOf:
+        - $ref: '#/definitions/models.OrderAction'
+        example: buy
+      amount:
+        example: 100
+        minimum: 1
         type: integer
-      charging_fee:
-        type: string
-      coins:
-        type: integer
-      contact:
-        type: string
-      content:
-        type: string
-      created_at:
-        type: string
-      creator_id:
+      user_id:
+        description: FIXME:user_id should be retrieved from the user's jwt token
         example: uuid
         type: string
-      ending_at:
-        type: string
-      hoster:
-        type: string
-      hosting_at:
+    required:
+    - action
+    - amount
+    - user_id
+    type: object
+  models.Order:
+    properties:
+      action:
+        allOf:
+        - $ref: '#/definitions/models.OrderAction'
+        example: buy
+      amount:
+        example: 100
+        type: integer
+      created_at:
+        example: "2021-01-01T00:00:00Z"
         type: string
       id:
         example: uuid
         type: string
-      is_active:
-        type: boolean
-      is_deleted:
-        type: boolean
-      location:
-        type: string
-      max_participant_count:
+      price:
+        description: using int instead of float64 to avoid floating point precision
+          issue
+        example: 10
         type: integer
-      participant_count:
-        type: integer
-      picture_url:
-        type: string
-      point:
-        type: string
-      speaker:
-        type: string
-      status:
-        $ref: '#/definitions/models.OrderStatus'
-      tags:
-        items:
-          type: string
-        type: array
-      title:
-        type: string
-      updated_at:
-        type: string
-      url:
-        type: string
     type: object
-  models.OrderStatus:
+  models.OrderAction:
     enum:
-    - normal
-    - attending
-    - attended
-    - recommended
+    - buy
+    - sell
     type: string
-    x-enum-comments:
-      Attended: 之前的活動
-      Attending: 已報名
-      Normal: 報名參加
-      Recommended: 推薦參加
     x-enum-varnames:
-    - Normal
-    - Attending
-    - Attended
-    - Recommended
+    - Buy
+    - Sell
+  models.OrderBoardType:
+    enum:
+    - live
+    - history
+    - removed
+    type: string
+    x-enum-varnames:
+    - Live
+    - History
+    - Removed
 host: kickstart.gcp_project_name.tw
 info:
   contact: {}
@@ -106,45 +100,51 @@ info:
   title: Order (aka Broadcast Service) API
   version: v1
 paths:
-  /kickstarts:
-    get:
-      description: Get a list of kickstarts where the parameter filter decides whether
-        to return a list of general, attending, or attended kickstarts w.s.t to the
-        given user
+  /orders:
+    delete:
+      description: Delete a order
       parameters:
-      - description: Tag    []string            `form:"tag" validate:"optional"`
-        in: query
-        name: app_id
+      - description: ID of order
+        in: path
+        name: order_id
+        required: true
         type: string
-      - default: 10
-        description: number of elements requested
-        in: query
-        name: count
-        type: integer
-      - description: param to decide whether to return a list of recommended, attending,
-          or attended kickstarts
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.errorResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.errorResp'
+      security:
+      - Bearer: []
+      summary: Delete a order
+      tags:
+      - order
+    get:
+      description: Get a order board
+      parameters:
+      - description: |-
+          FIXME: add pagination with var below
+          pageReq
+          if true, return orders created by the user
         enum:
-        - normal
-        - attending
-        - attended
-        - recommended
+        - live
+        - history
+        - removed
         in: query
-        name: filter
+        name: board_type
         type: string
-        x-enum-comments:
-          Attended: 之前的活動
-          Attending: 已報名
-          Normal: 報名參加
-          Recommended: 推薦參加
         x-enum-varnames:
-        - Normal
-        - Attending
-        - Attended
-        - Recommended
-      - description: next cursor value, use it when requesting next page
-        in: query
-        name: next
-        type: string
+        - Live
+        - History
+        - Removed
       produces:
       - application/json
       responses:
@@ -169,49 +169,18 @@ paths:
             $ref: '#/definitions/api.errorResp'
       security:
       - Bearer: []
-      summary: Get a list of kickstarts
+      summary: Get a order board
       tags:
-      - kickstart
-  /kickstarts/{kickstart_id}:
-    get:
-      description: Get a kickstart with its detailed info
+      - order
+    patch:
+      description: Take a order
       parameters:
-      - description: ID of a kickstart
-        example: 8306778b-7287-f72b-6b26-a95316de96e4
-        in: path
-        name: kickstart_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Order'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.errorResp'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/api.errorResp'
-      security:
-      - Bearer: []
-      summary: Get a kickstart
-      tags:
-      - kickstart
-  /kickstarts/attendance:
-    post:
-      description: Attend a kickstart
-      parameters:
-      - description: kickstart id to attend and user's email
+      - description: order id to attend and user's email
         in: body
         name: jsonBody
         required: true
         schema:
-          $ref: '#/definitions/api.attendReq'
+          $ref: '#/definitions/api.takeOrderBody'
       produces:
       - application/json
       responses:
@@ -227,9 +196,36 @@ paths:
             $ref: '#/definitions/api.errorResp'
       security:
       - Bearer: []
-      summary: Attend a kickstart
+      summary: Take a order
       tags:
-      - kickstart
+      - order
+    post:
+      description: Make a order
+      parameters:
+      - description: order id to attend and user's email
+        in: body
+        name: jsonBody
+        required: true
+        schema:
+          $ref: '#/definitions/api.makeOrderBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.errorResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.errorResp'
+      security:
+      - Bearer: []
+      summary: Make a order
+      tags:
+      - order
 schemes:
 - http
 securityDefinitions:

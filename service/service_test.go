@@ -33,7 +33,7 @@ func TestMain(m *testing.M) {
 	cache.Initialize(&cache.Config{
 		Type:     cache.TypeLocal,
 		RedisURL: "localhost:6379",
-		Prefix:   "kickstart-dev",
+		Prefix:   "local-dev",
 	})
 	defer cache.Finalize()
 

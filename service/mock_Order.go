@@ -14,66 +14,54 @@ type MockOrder struct {
 	mock.Mock
 }
 
-// Get provides a mock function with given fields: ctx, userID, kickstartID
-func (_m *MockOrder) Get(ctx context.Context, userID string, kickstartID string) (*models.Order, error) {
-	ret := _m.Called(ctx, userID, kickstartID)
+// Delete provides a mock function with given fields: ctx, orderID
+func (_m *MockOrder) Delete(ctx context.Context, orderID string) error {
+	ret := _m.Called(ctx, orderID)
 
 	if len(ret) == 0 {
-		panic("no return value specified for Get")
+		panic("no return value specified for Delete")
 	}
 
-	var r0 *models.Order
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*models.Order, error)); ok {
-		return rf(ctx, userID, kickstartID)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) *models.Order); ok {
-		r0 = rf(ctx, userID, kickstartID)
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
+		r0 = rf(ctx, orderID)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*models.Order)
-		}
+		r0 = ret.Error(0)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
-		r1 = rf(ctx, userID, kickstartID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
-// GetOrders provides a mock function with given fields: ctx, userID, next, count, filter
-func (_m *MockOrder) GetOrders(ctx context.Context, userID string, next string, count int, filter models.OrderStatus) ([]*models.Order, string, error) {
-	ret := _m.Called(ctx, userID, next, count, filter)
+// GetBoard provides a mock function with given fields: ctx, boardType
+func (_m *MockOrder) GetBoard(ctx context.Context, boardType models.OrderBoardType) (*models.Board, string, error) {
+	ret := _m.Called(ctx, boardType)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetOrders")
+		panic("no return value specified for GetBoard")
 	}
 
-	var r0 []*models.Order
+	var r0 *models.Board
 	var r1 string
 	var r2 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, int, models.OrderStatus) ([]*models.Order, string, error)); ok {
-		return rf(ctx, userID, next, count, filter)
+	if rf, ok := ret.Get(0).(func(context.Context, models.OrderBoardType) (*models.Board, string, error)); ok {
+		return rf(ctx, boardType)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, int, models.OrderStatus) []*models.Order); ok {
-		r0 = rf(ctx, userID, next, count, filter)
+	if rf, ok := ret.Get(0).(func(context.Context, models.OrderBoardType) *models.Board); ok {
+		r0 = rf(ctx, boardType)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*models.Order)
+			r0 = ret.Get(0).(*models.Board)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string, string, int, models.OrderStatus) string); ok {
-		r1 = rf(ctx, userID, next, count, filter)
+	if rf, ok := ret.Get(1).(func(context.Context, models.OrderBoardType) string); ok {
+		r1 = rf(ctx, boardType)
 	} else {
 		r1 = ret.Get(1).(string)
 	}
 
-	if rf, ok := ret.Get(2).(func(context.Context, string, string, int, models.OrderStatus) error); ok {
-		r2 = rf(ctx, userID, next, count, filter)
+	if rf, ok := ret.Get(2).(func(context.Context, models.OrderBoardType) error); ok {
+		r2 = rf(ctx, boardType)
 	} else {
 		r2 = ret.Error(2)
 	}
@@ -81,17 +69,35 @@ func (_m *MockOrder) GetOrders(ctx context.Context, userID string, next string, 
 	return r0, r1, r2
 }
 
-// New provides a mock function with given fields: ctx, userID, kickstartID, email
-func (_m *MockOrder) New(ctx context.Context, userID string, kickstartID string, email *string) error {
-	ret := _m.Called(ctx, userID, kickstartID, email)
+// Make provides a mock function with given fields: ctx, action, price, amount
+func (_m *MockOrder) Make(ctx context.Context, action models.OrderAction, price int, amount int) error {
+	ret := _m.Called(ctx, action, price, amount)
 
 	if len(ret) == 0 {
-		panic("no return value specified for New")
+		panic("no return value specified for Make")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, *string) error); ok {
-		r0 = rf(ctx, userID, kickstartID, email)
+	if rf, ok := ret.Get(0).(func(context.Context, models.OrderAction, int, int) error); ok {
+		r0 = rf(ctx, action, price, amount)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Take provides a mock function with given fields: ctx, action, amount, takerID
+func (_m *MockOrder) Take(ctx context.Context, action models.OrderAction, amount int, takerID string) error {
+	ret := _m.Called(ctx, action, amount, takerID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Take")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.OrderAction, int, string) error); ok {
+		r0 = rf(ctx, action, amount, takerID)
 	} else {
 		r0 = ret.Error(0)
 	}
