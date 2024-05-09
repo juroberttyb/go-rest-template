@@ -1,7 +1,7 @@
 # tradebook
-This repo implements a trade engine that accepts orders via the protocol (or triggering) you defined.
+This repo implements a trade engine that accepts orders via the REST protocol.
 <br>
-An order request at least has this information (buy or sell, quantity, market price or limit price). 
+An order request consists of these information (buy or sell, quantity, market price or limit price). 
 
 
 ## quickstart

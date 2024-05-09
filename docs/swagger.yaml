@@ -13,7 +13,7 @@ definitions:
         allOf:
         - $ref: '#/definitions/models.OrderAction'
         example: buy
-      amount:
+      quantity:
         example: 100
         minimum: 1
         type: integer
@@ -23,7 +23,7 @@ definitions:
         type: integer
     required:
     - action
-    - amount
+    - quantity
     - price
     type: object
   api.pageResp:
@@ -40,13 +40,13 @@ definitions:
         - $ref: '#/definitions/models.OrderAction'
         description: FIXME:user_id should be retrieved from the user's jwt token
         example: buy
-      amount:
+      quantity:
         example: 100
         minimum: 1
         type: integer
     required:
     - action
-    - amount
+    - quantity
     type: object
   models.Order:
     properties:
@@ -54,7 +54,7 @@ definitions:
         allOf:
         - $ref: '#/definitions/models.OrderAction'
         example: buy
-      amount:
+      quantity:
         example: 100
         type: integer
       created_at:

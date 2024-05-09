@@ -226,7 +226,7 @@
             "type": "object",
             "required": [
                 "action",
-                "amount",
+                "quantity",
                 "price"
             ],
             "properties": {
@@ -238,7 +238,7 @@
                     ],
                     "example": "buy"
                 },
-                "amount": {
+                "quantity": {
                     "type": "integer",
                     "minimum": 1,
                     "example": 100
@@ -264,7 +264,7 @@
             "type": "object",
             "required": [
                 "action",
-                "amount"
+                "quantity"
             ],
             "properties": {
                 "action": {
@@ -276,7 +276,7 @@
                     ],
                     "example": "buy"
                 },
-                "amount": {
+                "quantity": {
                     "type": "integer",
                     "minimum": 1,
                     "example": 100
@@ -294,7 +294,7 @@
                     ],
                     "example": "buy"
                 },
-                "amount": {
+                "quantity": {
                     "type": "integer",
                     "example": 100
                 },

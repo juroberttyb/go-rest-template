@@ -69,9 +69,9 @@ func (_m *MockOrder) GetBoard(ctx context.Context, boardType models.OrderBoardTy
 	return r0, r1, r2
 }
 
-// Make provides a mock function with given fields: ctx, action, price, amount
-func (_m *MockOrder) Make(ctx context.Context, action models.OrderAction, price int, amount int) error {
-	ret := _m.Called(ctx, action, price, amount)
+// Make provides a mock function with given fields: ctx, action, price, quantity
+func (_m *MockOrder) Make(ctx context.Context, action models.OrderAction, price int, quantity int) error {
+	ret := _m.Called(ctx, action, price, quantity)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Make")
@@ -79,7 +79,7 @@ func (_m *MockOrder) Make(ctx context.Context, action models.OrderAction, price 
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, models.OrderAction, int, int) error); ok {
-		r0 = rf(ctx, action, price, amount)
+		r0 = rf(ctx, action, price, quantity)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -87,9 +87,9 @@ func (_m *MockOrder) Make(ctx context.Context, action models.OrderAction, price 
 	return r0
 }
 
-// Take provides a mock function with given fields: ctx, action, amount
-func (_m *MockOrder) Take(ctx context.Context, action models.OrderAction, amount int) error {
-	ret := _m.Called(ctx, action, amount)
+// Take provides a mock function with given fields: ctx, action, quantity
+func (_m *MockOrder) Take(ctx context.Context, action models.OrderAction, quantity int) error {
+	ret := _m.Called(ctx, action, quantity)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Take")
@@ -97,7 +97,7 @@ func (_m *MockOrder) Take(ctx context.Context, action models.OrderAction, amount
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, models.OrderAction, int) error); ok {
-		r0 = rf(ctx, action, amount)
+		r0 = rf(ctx, action, quantity)
 	} else {
 		r0 = ret.Error(0)
 	}

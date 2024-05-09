@@ -19,7 +19,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"action\": \"sell\", \n    \"price\": 50,\n    \"amount\": 10\n}",
+					"raw": "{\n    \"action\": \"sell\", \n    \"price\": 50,\n    \"quantity\": 10\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -91,7 +91,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"action\": \"buy\", \n    \"amount\": 2\n}",
+					"raw": "{\n    \"action\": \"buy\", \n    \"quantity\": 2\n}",
 					"options": {
 						"raw": {
 							"language": "json"

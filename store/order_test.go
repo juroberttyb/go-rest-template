@@ -47,5 +47,5 @@ func TestOrderDBIIntegration(t *testing.T) {
 		t.Fatalf("get live sell orders failed: %s", err.Error())
 	}
 	require.Equal(t, 1, len(sellOrders), "expect 1 sell order")
-	require.Equal(t, 8, sellOrders[0].Amount, "expect sell order amount to be 8")
+	require.Equal(t, 8, sellOrders[0].Quantity, "expect sell order quantity to be 8")
 }

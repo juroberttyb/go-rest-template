@@ -19,7 +19,7 @@ func addOrderRoutes(root *gin.RouterGroup, c service.Order) {
 
 	root.GET("board", h.getBoard)
 
-	// FIXME: need to consider order status modification under heavy concurrent access (taking an order already removed, two takes at the same order which exceeds order provided amount...)
+	// FIXME: need to consider order status modification under heavy concurrent access (taking an order already removed, two takes at the same order which exceeds order provided quantity...)
 	g := root.Group("orders")
 	// FIXME: need to do pagination and filter, pagination should start from latest taker price and grow up and down
 	// FIXME: implement this get method
@@ -67,12 +67,12 @@ func (h *orderHandler) getBoard(ctx *gin.Context) {
 	})
 }
 
-// FIXME: need to consider integer overflow here, for example price*amount > int max value
+// FIXME: need to consider integer overflow here, for example price*quantity > int max value
 // FIXME: should use fixed type in64 or int32 instead of int to avoid overflow
 type makeOrderBody struct {
-	Action models.OrderAction `json:"action" binding:"required" example:"buy"`
-	Price  int                `json:"price" binding:"required,min=1" example:"10"`
-	Amount int                `json:"amount" binding:"required,min=1" example:"100"`
+	Action   models.OrderAction `json:"action" binding:"required" example:"buy"`
+	Price    int                `json:"price" binding:"required,min=1" example:"10"`
+	Quantity int                `json:"quantity" binding:"required,min=1" example:"100"`
 }
 
 // @Summary		Make a order
@@ -96,7 +96,7 @@ func (h *orderHandler) make(ctx *gin.Context) {
 		ctx.Request.Context(),
 		b.Action,
 		b.Price,
-		b.Amount,
+		b.Quantity,
 	); err != nil {
 		handleError(ctx, err)
 		return
@@ -106,8 +106,8 @@ func (h *orderHandler) make(ctx *gin.Context) {
 
 type takeOrderBody struct {
 	// FIXME:user_id should be retrieved from the user's jwt token
-	Action models.OrderAction `json:"action" binding:"required" example:"buy"`
-	Amount int                `json:"amount" binding:"required,min=1" example:"100"`
+	Action   models.OrderAction `json:"action" binding:"required" example:"buy"`
+	Quantity int                `json:"quantity" binding:"required,min=1" example:"100"`
 }
 
 // @Summary		Take a order
@@ -130,7 +130,7 @@ func (h *orderHandler) take(ctx *gin.Context) {
 	if err := h.c.Take(
 		ctx.Request.Context(),
 		b.Action,
-		b.Amount,
+		b.Quantity,
 	); err != nil {
 		handleError(ctx, err)
 		return

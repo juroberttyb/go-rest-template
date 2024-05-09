@@ -229,7 +229,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "action",
-                "amount",
+                "quantity",
                 "price"
             ],
             "properties": {
@@ -241,7 +241,7 @@ const docTemplate = `{
                     ],
                     "example": "buy"
                 },
-                "amount": {
+                "quantity": {
                     "type": "integer",
                     "minimum": 1,
                     "example": 100
@@ -267,7 +267,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "action",
-                "amount"
+                "quantity"
             ],
             "properties": {
                 "action": {
@@ -279,7 +279,7 @@ const docTemplate = `{
                     ],
                     "example": "buy"
                 },
-                "amount": {
+                "quantity": {
                     "type": "integer",
                     "minimum": 1,
                     "example": 100
@@ -297,7 +297,7 @@ const docTemplate = `{
                     ],
                     "example": "buy"
                 },
-                "amount": {
+                "quantity": {
                     "type": "integer",
                     "example": 100
                 },

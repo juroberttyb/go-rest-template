@@ -24,7 +24,7 @@ type Order struct {
 	Action OrderAction `json:"action" db:"action" example:"buy"`
 	// using int instead of float64 to avoid floating point precision issue
 	Price     int       `json:"price" db:"price" example:"10"`
-	Amount    int       `json:"amount" db:"amount" example:"100"`
+	Quantity  int       `json:"quantity" db:"quantity" example:"100"`
 	CreatedAt time.Time `json:"created_at" db:"created_at" example:"2021-01-01T00:00:00Z"`
 }
 

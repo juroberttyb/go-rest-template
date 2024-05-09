@@ -34,7 +34,7 @@ func (s *orderStore) GetLiveOrders(ctx context.Context, action models.OrderActio
 			id,
 			action,
 			price,
-			amount,
+			quantity,
 			created_at
 		FROM public.order
 		WHERE 
@@ -69,12 +69,12 @@ func (s *orderStore) GetLiveOrders(ctx context.Context, action models.OrderActio
 	return orders, nil
 }
 
-func (s *orderStore) Make(ctx context.Context, action models.OrderAction, price, amount int) error {
+func (s *orderStore) Make(ctx context.Context, action models.OrderAction, price, quantity int) error {
 	query := `
 		INSERT INTO public.order (
 			action,
 			price,
-			amount
+			quantity
 		)
 		VALUES (
 			?,
@@ -85,7 +85,7 @@ func (s *orderStore) Make(ctx context.Context, action models.OrderAction, price,
 	values := []interface{}{
 		action,
 		price,
-		amount,
+		quantity,
 	}
 	query = s.db.Rebind(query)
 	if _, err := s.db.Exec(query, values...); err != nil {
@@ -96,7 +96,7 @@ func (s *orderStore) Make(ctx context.Context, action models.OrderAction, price,
 }
 
 // FIXME: currently only buy action is supported
-func (s *orderStore) Take(ctx context.Context, action models.OrderAction, amount int) (int, error) {
+func (s *orderStore) Take(ctx context.Context, action models.OrderAction, quantity int) (int, error) {
 	var latestPrice int
 
 	db := database.GetPostgres()
@@ -106,7 +106,7 @@ func (s *orderStore) Take(ctx context.Context, action models.OrderAction, amount
 			SELECT 
 				id,
 				price,
-				amount,
+				quantity,
 				created_at
 			FROM public.order
 			WHERE 
@@ -126,21 +126,21 @@ func (s *orderStore) Take(ctx context.Context, action models.OrderAction, amount
 		}
 
 		orderIDs := []string{}
-		// FIXME: currently this take orders until amount is 0, but if selling orders are not enough, it should be handled
+		// FIXME: currently this take orders until quantity is 0, but if selling orders are not enough, it should be handled
 		for _, order := range orders {
-			if amount == 0 {
+			if quantity == 0 {
 				break
 			}
-			if order.Amount > amount {
+			if order.Quantity > quantity {
 				query := `
 					UPDATE public.order
 					SET
-						amount=?
+						quantity=?
 					WHERE
 					id=?
 				`
 				values := []interface{}{
-					order.Amount - amount,
+					order.Quantity - quantity,
 					order.ID,
 				}
 				query = tx.Rebind(query)
@@ -148,11 +148,11 @@ func (s *orderStore) Take(ctx context.Context, action models.OrderAction, amount
 					logging.Errorw(ctx, "store update order in take order failed", "err", err)
 					return parseError(err)
 				}
-				amount = 0
+				quantity = 0
 				latestPrice = order.Price
 			} else {
 				orderIDs = append(orderIDs, order.ID)
-				amount = amount - order.Amount
+				quantity = quantity - order.Quantity
 			}
 		}
 

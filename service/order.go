@@ -138,7 +138,7 @@ func (s *orderSvc) GetBoard(ctx context.Context, boardType models.OrderBoardType
 	return board, next, nil
 }
 
-func (s *orderSvc) Make(ctx context.Context, action models.OrderAction, price, amount int) error {
+func (s *orderSvc) Make(ctx context.Context, action models.OrderAction, price, quantity int) error {
 	if action == models.Buy && price >= s.LatestPrice {
 		err := fmt.Errorf("price to buy %d should not be lower than latest price %d", price, s.LatestPrice)
 		logging.Errorw(ctx, "service make order failed", "err", err)
@@ -152,7 +152,7 @@ func (s *orderSvc) Make(ctx context.Context, action models.OrderAction, price, a
 
 	s.BoardGuard.Lock()
 	// FIXME: should update to cache after make order
-	if err := s.c.Make(ctx, action, price, amount); err != nil {
+	if err := s.c.Make(ctx, action, price, quantity); err != nil {
 		logging.Errorw(ctx, "service make order failed", "err", err)
 		return err
 	}
@@ -188,7 +188,7 @@ func (s *orderSvc) Make(ctx context.Context, action models.OrderAction, price, a
 	return nil
 }
 
-func (s *orderSvc) Take(ctx context.Context, action models.OrderAction, amount int) error {
+func (s *orderSvc) Take(ctx context.Context, action models.OrderAction, quantity int) error {
 	if action != models.Buy {
 		err := fmt.Errorf("currently, only buy action is supported, got %s", action)
 		logging.Errorw(ctx, "service take order failed", "err", err)
@@ -197,7 +197,7 @@ func (s *orderSvc) Take(ctx context.Context, action models.OrderAction, amount i
 
 	// FIXME: should update to cache after take order
 	s.BoardGuard.Lock()
-	latestPrice, err := s.c.Take(ctx, action, amount)
+	latestPrice, err := s.c.Take(ctx, action, quantity)
 	if err != nil {
 		logging.Errorw(ctx, "service take order failed", "err", err)
 		return err

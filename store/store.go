@@ -13,7 +13,7 @@ import (
 // Chat defines all chatroom related operations
 type Order interface {
 	GetLiveOrders(ctx context.Context, action models.OrderAction) ([]*models.Order, error)
-	Make(ctx context.Context, action models.OrderAction, price, amount int) error
-	Take(ctx context.Context, action models.OrderAction, amount int) (int, error)
+	Make(ctx context.Context, action models.OrderAction, price, quantity int) error
+	Take(ctx context.Context, action models.OrderAction, quantity int) (int, error)
 	Delete(ctx context.Context, orderID string) error
 }
