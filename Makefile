@@ -53,6 +53,7 @@ mocks:
 	find . -type f -name 'mock_*.go' -exec rm {} +
 	./mockery --all --inpackage
 
+# https://github.com/golang-migrate/migrate, check here for more detail on database migration
 migration-script:
 	./migrate create -ext sql -dir database/migrations -seq create_new_table
 
