@@ -13,18 +13,18 @@ definitions:
         allOf:
         - $ref: '#/definitions/models.OrderAction'
         example: buy
-      quantity:
-        example: 100
-        minimum: 1
-        type: integer
       price:
         example: 10
         minimum: 1
         type: integer
+      quantity:
+        example: 100
+        minimum: 1
+        type: integer
     required:
     - action
-    - quantity
     - price
+    - quantity
     type: object
   api.pageResp:
     properties:
@@ -54,9 +54,6 @@ definitions:
         allOf:
         - $ref: '#/definitions/models.OrderAction'
         example: buy
-      quantity:
-        example: 100
-        type: integer
       created_at:
         example: "2021-01-01T00:00:00Z"
         type: string
@@ -67,6 +64,9 @@ definitions:
         description: using int instead of float64 to avoid floating point precision
           issue
         example: 10
+        type: integer
+      quantity:
+        example: 100
         type: integer
     type: object
   models.OrderAction:
@@ -87,7 +87,7 @@ definitions:
     - Live
     - History
     - Removed
-host: kickstart.gcp_project_name.tw
+host: localhost:8000
 info:
   contact: {}
   description: |-

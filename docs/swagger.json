@@ -9,7 +9,7 @@
         "contact": {},
         "version": "v1"
     },
-    "host": "kickstart.gcp_project_name.tw",
+    "host": "localhost:8000",
     "basePath": "/",
     "paths": {
         "/orders": {
@@ -226,8 +226,8 @@
             "type": "object",
             "required": [
                 "action",
-                "quantity",
-                "price"
+                "price",
+                "quantity"
             ],
             "properties": {
                 "action": {
@@ -238,15 +238,15 @@
                     ],
                     "example": "buy"
                 },
-                "quantity": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "example": 100
-                },
                 "price": {
                     "type": "integer",
                     "minimum": 1,
                     "example": 10
+                },
+                "quantity": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "example": 100
                 }
             }
         },
@@ -294,10 +294,6 @@
                     ],
                     "example": "buy"
                 },
-                "quantity": {
-                    "type": "integer",
-                    "example": 100
-                },
                 "created_at": {
                     "type": "string",
                     "example": "2021-01-01T00:00:00Z"
@@ -310,6 +306,10 @@
                     "description": "using int instead of float64 to avoid floating point precision issue",
                     "type": "integer",
                     "example": 10
+                },
+                "quantity": {
+                    "type": "integer",
+                    "example": 100
                 }
             }
         },
