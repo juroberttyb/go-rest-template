@@ -53,6 +53,9 @@ mocks:
 	find . -type f -name 'mock_*.go' -exec rm {} +
 	./mockery --all --inpackage
 
+migration-script:
+	./migrate create -ext sql -dir database/migrations -seq create_new_table
+
 unit-test:
 	go test -v -cover -short ./...
 
