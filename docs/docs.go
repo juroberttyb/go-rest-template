@@ -229,8 +229,8 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "action",
-                "quantity",
-                "price"
+                "price",
+                "quantity"
             ],
             "properties": {
                 "action": {
@@ -241,15 +241,15 @@ const docTemplate = `{
                     ],
                     "example": "buy"
                 },
-                "quantity": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "example": 100
-                },
                 "price": {
                     "type": "integer",
                     "minimum": 1,
                     "example": 10
+                },
+                "quantity": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "example": 100
                 }
             }
         },
@@ -297,10 +297,6 @@ const docTemplate = `{
                     ],
                     "example": "buy"
                 },
-                "quantity": {
-                    "type": "integer",
-                    "example": 100
-                },
                 "created_at": {
                     "type": "string",
                     "example": "2021-01-01T00:00:00Z"
@@ -313,6 +309,10 @@ const docTemplate = `{
                     "description": "using int instead of float64 to avoid floating point precision issue",
                     "type": "integer",
                     "example": 10
+                },
+                "quantity": {
+                    "type": "integer",
+                    "example": 100
                 }
             }
         },
@@ -354,7 +354,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "v1",
-	Host:             "kickstart.gcp_project_name.tw",
+	Host:             "localhost:8000",
 	BasePath:         "/",
 	Schemes:          []string{"http"},
 	Title:            "Order (aka Broadcast Service) API",
