@@ -94,6 +94,7 @@ func TestGetBoardAPIIntegration(t *testing.T) {
 	// let's turn on the readiness indication flag.
 	global.Ready = true
 
+	log.Println("Resource for testing initialized...")
 	url := tests.BaseURL + "/board?board_type=live"
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -103,11 +104,14 @@ func TestGetBoardAPIIntegration(t *testing.T) {
 	req.Header.Set("Accept", "*/*")
 	req.Header.Set("Accept-Encoding", "gzip, deflate, br")
 	client := &http.Client{}
+
+	log.Println("API request prepared, making request to server...")
 	res, err := client.Do(req)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
 	defer res.Body.Close()
+	log.Println("Request made, parsing response status code and result...")
 
 	if res.StatusCode != http.StatusOK {
 		t.Fatalf("status code %d != 200", res.StatusCode)
