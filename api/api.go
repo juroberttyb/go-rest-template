@@ -93,7 +93,7 @@ func createRouterAndGroup(prefix string) *gin.Engine {
 // installCommonMiddleware installs common middleware to the router group.
 func installCommonMiddleware(root *gin.RouterGroup) {
 	// support open tracing
-	root.Use(otelgin.Middleware("kickstart-api"))
+	root.Use(otelgin.Middleware("kickstart"))
 
 	// Install logger middleware, a middleware to log requests.
 	root.Use(logging.RequestLogger([]string{"/alive", "/ready"}))

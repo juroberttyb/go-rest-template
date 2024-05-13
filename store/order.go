@@ -6,6 +6,7 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/A-pen-app/kickstart/config"
 	"github.com/A-pen-app/kickstart/database"
 	"github.com/A-pen-app/kickstart/models"
 	"github.com/A-pen-app/logging"
@@ -26,7 +27,9 @@ func NewOrder(db *sqlx.DB) Order {
 }
 
 func (s *orderStore) GetLiveOrders(ctx context.Context, action models.OrderAction) ([]*models.Order, error) {
-	defer tracing.Start(ctx, "store.get.orders.live").End()
+	if !config.GetBool("TESTING") {
+		defer tracing.Start(ctx, "store.get.orders.live").End()
+	}
 
 	orders := []*models.Order{}
 	query := `

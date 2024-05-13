@@ -10,10 +10,8 @@ import (
 	"github.com/A-pen-app/cache"
 	"github.com/A-pen-app/kickstart/config"
 	"github.com/A-pen-app/kickstart/database"
-	"github.com/A-pen-app/kickstart/global"
 	"github.com/A-pen-app/kickstart/models"
 	"github.com/A-pen-app/logging"
-	"github.com/A-pen-app/tracing"
 	"github.com/stretchr/testify/require"
 )
 
@@ -46,19 +44,6 @@ func TestOrderDBIntegration(t *testing.T) {
 		panic(err)
 	}
 	defer logging.Finalize()
-
-	// Setup tracing module
-	env := "development"
-	if config.GetBool("PRODUCTION_ENVIRONMENT") {
-		env = "production"
-	}
-	tracing.Initialize(ctx, &tracing.Config{
-		ProjectID:             config.GetString("PROJECT_ID"),
-		TracerName:            "kickstart-api",
-		ServiceName:           global.ServiceName,
-		DeploymentEnvironment: env,
-	})
-	defer tracing.Finalize(ctx)
 
 	cache.Initialize(&cache.Config{
 		Type:     cache.TypeLocal,
