@@ -68,7 +68,10 @@ func (db *postgresDB) initialize(ctx context.Context, cfg dbConfig) {
 		panic(err)
 	}
 	// do not run migrate when running tests, otherwise, the migration file path "file://database/migrations" will fail the integration tests
-	db.migrate()
+	if !config.GetBool("TESTING") {
+		logging.Info(ctx, "Running database migrations")
+		db.migrate()
+	}
 }
 
 func (db *postgresDB) migrate() {

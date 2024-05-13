@@ -30,9 +30,12 @@ jobs:
       - name: run services
         run: |
           make local-dev-up
-      - name: integration test for database logics
+      - name: run server
         run: |
-          make db-integration-test
+          screen -dm bash -c "make run;"
+      - name: integration test
+        run: |
+          make integration-test
   deploy: 
     needs: [integration-test]
     runs-on: ubuntu-latest

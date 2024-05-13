@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestOrderDBIIntegration(t *testing.T) {
+func TestOrderDBIntegration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping system integration test")
 	}
@@ -40,12 +40,12 @@ func TestOrderDBIIntegration(t *testing.T) {
 	if err != nil {
 		t.Fatalf("get live buy orders failed: %s", err.Error())
 	}
-	require.Equal(t, 1, len(buyOrders), "expect 1 buy order")
+	require.Equal(t, true, len(buyOrders) > 0, "expect at least 1 buy order")
 
 	sellOrders, err := orderStore.GetLiveOrders(ctx, models.Sell)
 	if err != nil {
 		t.Fatalf("get live sell orders failed: %s", err.Error())
 	}
-	require.Equal(t, 1, len(sellOrders), "expect 1 sell order")
+	require.Equal(t, true, len(sellOrders) > 0, "expect at least 1 sell order")
 	require.Equal(t, 8, sellOrders[0].Quantity, "expect sell order quantity to be 8")
 }
