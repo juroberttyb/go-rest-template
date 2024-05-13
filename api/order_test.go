@@ -108,7 +108,15 @@ func TestGetBoardAPIIntegration(t *testing.T) {
 	log.Println("API request prepared, making request to server...")
 	res, err := client.Do(req)
 	if err != nil {
-		t.Fatal(err.Error())
+		t.Errorf("failed to make request: %s", err.Error())
+
+		log.Println("Parsing err response status code and result...")
+		body, err := io.ReadAll(res.Body)
+		if err != nil {
+			t.Fatal(err.Error())
+		}
+		log.Printf("Err response: %s", string(body))
+		return
 	}
 	defer res.Body.Close()
 	log.Println("Request made, parsing response status code and result...")
