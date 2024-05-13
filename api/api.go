@@ -2,6 +2,7 @@
 package api
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -52,6 +53,8 @@ func initializeRouter() *gin.Engine {
 // @name						Authorization
 // @description				Type "Bearer" followed by a space and JWT.
 func createRouterAndGroup(prefix string) *gin.Engine {
+	ctx := context.Background()
+
 	// Create a clean HTTP router engine.
 	engine := gin.New()
 
@@ -72,16 +75,17 @@ func createRouterAndGroup(prefix string) *gin.Engine {
 	db := database.GetPostgres()
 
 	pubsub := mq.GetPubsub()
-
+	cryptoStore := store.NewCrypto(ctx)
 	orderStore := store.NewOrder(db)
 
+	authSvc := service.NewAuth(ctx, cryptoStore)
 	orderSvc := service.NewOrder(orderStore, pubsub)
 
 	// register routes
 	addDocRoutes(root)
 	addProbesRoutes(root)
 	addSystemRoutes(root)
-	addOrderRoutes(root, orderSvc)
+	addOrderRoutes(root, orderSvc, authSvc)
 
 	return engine
 }

@@ -3,30 +3,73 @@ package api
 import (
 	"net/http"
 
+	"github.com/A-pen-app/kickstart/api/middleware"
 	"github.com/A-pen-app/kickstart/models"
 	"github.com/A-pen-app/kickstart/service"
 	"github.com/gin-gonic/gin"
 )
 
 type orderHandler struct {
-	c service.Order
+	c    service.Order
+	auth service.Auth
 }
 
-func addOrderRoutes(root *gin.RouterGroup, c service.Order) {
+func addOrderRoutes(root *gin.RouterGroup, c service.Order, auth service.Auth) {
 	h := &orderHandler{
-		c: c,
+		c:    c,
+		auth: auth,
 	}
 
 	root.GET("board", h.getBoard)
 
-	// FIXME: need to consider order status modification under heavy concurrent access (taking an order already removed, two takes at the same order which exceeds order provided quantity...)
+	// FIXME: temporary token generator for testing
+	root.GET("token", h.getToken)
+
 	g := root.Group("orders")
+	g.Use(middleware.AuthUser(auth))
+	g.Use(middleware.NeedPermission(models.Audience))
+
 	// FIXME: need to do pagination and filter, pagination should start from latest taker price and grow up and down
 	// FIXME: implement this get method
 	// g.GET(":order_id", h.get)
 	g.POST("make", h.make)
 	g.PATCH("take", h.take)
 	g.DELETE(":order_id", h.delete)
+}
+
+type GetTokenReq struct {
+	UserID string `form:"user_id" binding:"required,uuid4"`
+}
+
+type GetTokenResp struct {
+	Token string `json:"token"`
+}
+
+// @Summary		temporary token generator for testing
+// @Description	temporary token generator for testing which return a JWT once verified.
+// @Tags		order
+// @Param		user_id	path	string	true	"ID of user to get token of"
+// @Produce		json
+// @Success		200	{object} 	loginResp
+// @Failure		400	{object}	errorResp "cannot generate token"
+// @Failure		500	{object}	errorResp
+// @Router			/token [get]
+func (h *orderHandler) getToken(ctx *gin.Context) {
+	p := GetTokenReq{}
+	if err := ctx.BindQuery(&p); err != nil {
+		handleError(ctx, err)
+		return
+	}
+
+	rctx := ctx.Request.Context()
+	token, err := h.auth.IssueToken(rctx, p.UserID, models.Audience)
+	if err != nil {
+		handleError(ctx, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, &GetTokenResp{
+		Token: token,
+	})
 }
 
 type getOrdersReq struct {
