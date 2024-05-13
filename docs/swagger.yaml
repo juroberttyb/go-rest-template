@@ -1,5 +1,10 @@
 basePath: /
 definitions:
+  api.GetTokenResp:
+    properties:
+      token:
+        type: string
+    type: object
   api.errorResp:
     properties:
       error:
@@ -96,33 +101,7 @@ info:
   title: Order (aka Broadcast Service) API
   version: v1
 paths:
-  /orders:
-    delete:
-      description: Delete a order
-      parameters:
-      - description: ID of order
-        in: path
-        name: order_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.errorResp'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/api.errorResp'
-      security:
-      - Bearer: []
-      summary: Delete a order
-      tags:
-      - order
+  /board:
     get:
       description: Get a order board
       parameters:
@@ -163,11 +142,65 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/api.errorResp'
-      security:
-      - Bearer: []
       summary: Get a order board
       tags:
       - order
+  /orders:
+    delete:
+      description: Delete a order
+      parameters:
+      - description: ID of order
+        in: path
+        name: order_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.errorResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.errorResp'
+      security:
+      - Bearer: []
+      summary: Delete a order
+      tags:
+      - order
+  /orders/make:
+    post:
+      description: Make a order
+      parameters:
+      - description: order id to attend and user's email
+        in: body
+        name: jsonBody
+        required: true
+        schema:
+          $ref: '#/definitions/api.makeOrderBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.errorResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.errorResp'
+      security:
+      - Bearer: []
+      summary: Make a order
+      tags:
+      - order
+  /orders/take:
     patch:
       description: Take a order
       parameters:
@@ -195,31 +228,31 @@ paths:
       summary: Take a order
       tags:
       - order
-    post:
-      description: Make a order
+  /token:
+    get:
+      description: temporary token generator for testing which return a JWT once verified.
       parameters:
-      - description: order id to attend and user's email
-        in: body
-        name: jsonBody
+      - description: ID of user to get token of
+        in: path
+        name: user_id
         required: true
-        schema:
-          $ref: '#/definitions/api.makeOrderBody'
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/api.GetTokenResp'
         "400":
-          description: Bad Request
+          description: cannot generate token
           schema:
             $ref: '#/definitions/api.errorResp'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/api.errorResp'
-      security:
-      - Bearer: []
-      summary: Make a order
+      summary: temporary token generator for testing
       tags:
       - order
 schemes:

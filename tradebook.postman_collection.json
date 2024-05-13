@@ -27,14 +27,10 @@
 					}
 				},
 				"url": {
-					"raw": "127.0.0.1:8000/orders/make",
+					"raw": "{{baseUrl}}/orders/make",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"orders",
 						"make"
@@ -63,17 +59,13 @@
 					}
 				},
 				"url": {
-					"raw": "127.0.0.1:8000/orders/061a18f2-6886-438b-954a-24b89f07549a",
+					"raw": "{{baseUrl}}/orders/e456c8a4-2c2e-41ed-bd6e-8d6882581478",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"orders",
-						"061a18f2-6886-438b-954a-24b89f07549a"
+						"e456c8a4-2c2e-41ed-bd6e-8d6882581478"
 					]
 				}
 			},
@@ -99,14 +91,10 @@
 					}
 				},
 				"url": {
-					"raw": "127.0.0.1:8000/orders/take",
+					"raw": "{{baseUrl}}/orders/take",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"orders",
 						"take"
@@ -138,14 +126,10 @@
 					}
 				},
 				"url": {
-					"raw": "127.0.0.1:8000/board?board_type=live",
+					"raw": "{{baseUrl}}/board?board_type=live",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"board"
 					],
@@ -153,6 +137,46 @@
 						{
 							"key": "board_type",
 							"value": "live"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "token",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwtToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/token?user_id=99181918-50a5-432a-aa0b-2bf45d1cdf42",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"token"
+					],
+					"query": [
+						{
+							"key": "user_id",
+							"value": "99181918-50a5-432a-aa0b-2bf45d1cdf42"
 						}
 					]
 				}

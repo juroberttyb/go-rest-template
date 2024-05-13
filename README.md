@@ -5,6 +5,12 @@ An order request consists of these information (buy or sell, quantity, market pr
 
 
 ## quickstart
+
+0. pre-requirement
+```
+$ create a key on gcp cloud kms for this app and update SYSTEM_KEY_ID feild in .env
+```
+
 1. spin up local development environment
 ```
 $ make local-dev-up
@@ -36,6 +42,7 @@ api -> service -> store -> implementations (database, encryption...)
 
 ## FIXME
 * mutex should not only be on codebase level, but also should be on kubernete level to ensure no multitple pods modifying the orders at the same time
+* add user api group
 
 ## todo
 * Update to use websocket instead of REST

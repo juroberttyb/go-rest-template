@@ -10,7 +10,7 @@ import (
 func GetString(key string) string {
 	val, exists := os.LookupEnv(key)
 	if !exists {
-		panic(key)
+		panic("environment variable not set: " + key)
 	}
 
 	return val
