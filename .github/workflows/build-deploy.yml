@@ -30,6 +30,7 @@ jobs:
       - name: run services
         run: |
           make local-dev-up
+      # this runs the api server and run database migration scripts
       - name: run server
         run: |
           screen -dm bash -c "make run;"
