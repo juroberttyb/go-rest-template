@@ -1,7 +1,9 @@
 package tests
 
+const DEFAULT_DEV_DEPLOY_URL = "dev-deploy-url"
+
 var (
-	BaseURL = "http://localhost:8000"
+	BaseURL = DEFAULT_DEV_DEPLOY_URL
 )
 
 func init() {

@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 	"testing"
 
@@ -16,6 +17,10 @@ func TestGetBoardAPIIntegration(t *testing.T) {
 		t.Skip("skipping system integration test")
 	}
 
+	if tests.BaseURL == tests.DEFAULT_DEV_DEPLOY_URL {
+		t.Skip("skipping api integration test; base URL not set")
+	}
+
 	url := tests.BaseURL + "/board?board_type=live"
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -25,11 +30,14 @@ func TestGetBoardAPIIntegration(t *testing.T) {
 	req.Header.Set("Accept", "*/*")
 	req.Header.Set("Accept-Encoding", "gzip, deflate, br")
 	client := &http.Client{}
+
+	log.Println("API request prepared, making request to server...")
 	res, err := client.Do(req)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
 	defer res.Body.Close()
+	log.Println("Request made, parsing response status code and result...")
 
 	if res.StatusCode != http.StatusOK {
 		t.Fatalf("status code %d != 200", res.StatusCode)
@@ -56,4 +64,6 @@ func TestGetBoardAPIIntegration(t *testing.T) {
 	t.Logf("Board: %+v", board)
 
 	require.Equal(t, true, board.LatestPrice != 0, "expect latest price to be non-zero")
+
+	log.Println("GetBoard API test finishing...")
 }

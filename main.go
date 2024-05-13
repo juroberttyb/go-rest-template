@@ -54,7 +54,7 @@ func main() {
 	}
 	tracing.Initialize(ctx, &tracing.Config{
 		ProjectID:             config.GetString("PROJECT_ID"),
-		TracerName:            "kickstart-api",
+		TracerName:            "kickstart",
 		ServiceName:           global.ServiceName,
 		DeploymentEnvironment: env,
 	})
