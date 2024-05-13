@@ -87,8 +87,7 @@ type getOrdersReq struct {
 // @Success		200	{object}	pageResp{data=[]models.Order}
 // @Failure		400	{object}	errorResp
 // @Failure		500	{object}	errorResp
-// @Router			/orders [get]
-// @Security		Bearer
+// @Router			/board [get]
 func (h *orderHandler) getBoard(ctx *gin.Context) {
 	p := getOrdersReq{}
 	if err := ctx.BindQuery(&p); err != nil {
@@ -126,7 +125,7 @@ type makeOrderBody struct {
 // @Success		200
 // @Failure		400	{object}	errorResp
 // @Failure		500	{object}	errorResp
-// @Router			/orders [post]
+// @Router			/orders/make [post]
 // @Security		Bearer
 func (h *orderHandler) make(ctx *gin.Context) {
 	b := makeOrderBody{}
@@ -161,7 +160,7 @@ type takeOrderBody struct {
 // @Success		200
 // @Failure		400	{object}	errorResp
 // @Failure		500	{object}	errorResp
-// @Router			/orders [patch]
+// @Router			/orders/take [patch]
 // @Security		Bearer
 func (h *orderHandler) take(ctx *gin.Context) {
 	b := takeOrderBody{}

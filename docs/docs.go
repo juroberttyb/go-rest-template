@@ -15,13 +15,8 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/orders": {
+        "/board": {
             "get": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
                 "description": "Get a order board",
                 "produces": [
                     "application/json"
@@ -83,7 +78,52 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/orders": {
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete a order",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "order"
+                ],
+                "summary": "Delete a order",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID of order",
+                        "name": "order_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.errorResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.errorResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/make": {
             "post": {
                 "security": [
                     {
@@ -126,48 +166,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "description": "Delete a order",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "order"
-                ],
-                "summary": "Delete a order",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "ID of order",
-                        "name": "order_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/api.errorResp"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/api.errorResp"
-                        }
-                    }
-                }
-            },
+            }
+        },
+        "/orders/take": {
             "patch": {
                 "security": [
                     {

@@ -101,33 +101,7 @@ info:
   title: Order (aka Broadcast Service) API
   version: v1
 paths:
-  /orders:
-    delete:
-      description: Delete a order
-      parameters:
-      - description: ID of order
-        in: path
-        name: order_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.errorResp'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/api.errorResp'
-      security:
-      - Bearer: []
-      summary: Delete a order
-      tags:
-      - order
+  /board:
     get:
       description: Get a order board
       parameters:
@@ -168,20 +142,18 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/api.errorResp'
-      security:
-      - Bearer: []
       summary: Get a order board
       tags:
       - order
-    patch:
-      description: Take a order
+  /orders:
+    delete:
+      description: Delete a order
       parameters:
-      - description: order id to attend and user's email
-        in: body
-        name: jsonBody
+      - description: ID of order
+        in: path
+        name: order_id
         required: true
-        schema:
-          $ref: '#/definitions/api.takeOrderBody'
+        type: string
       produces:
       - application/json
       responses:
@@ -197,9 +169,10 @@ paths:
             $ref: '#/definitions/api.errorResp'
       security:
       - Bearer: []
-      summary: Take a order
+      summary: Delete a order
       tags:
       - order
+  /orders/make:
     post:
       description: Make a order
       parameters:
@@ -225,6 +198,34 @@ paths:
       security:
       - Bearer: []
       summary: Make a order
+      tags:
+      - order
+  /orders/take:
+    patch:
+      description: Take a order
+      parameters:
+      - description: order id to attend and user's email
+        in: body
+        name: jsonBody
+        required: true
+        schema:
+          $ref: '#/definitions/api.takeOrderBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.errorResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.errorResp'
+      security:
+      - Bearer: []
+      summary: Take a order
       tags:
       - order
   /token:
