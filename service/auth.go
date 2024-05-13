@@ -21,9 +21,11 @@ type authSvc struct {
 }
 
 var systemKeyID string
+var app string
 
 // NewAuth returns an implementation of service.Auth
 func NewAuth(ctx context.Context, c store.Crypto) Auth {
+	app = config.GetString("PROJECT_NAME")
 	systemKeyID = config.GetString("SYSTEM_KEY_ID")
 	base64Key, err := c.GetPublicKey(ctx, systemKeyID)
 	if err != nil {
@@ -77,7 +79,7 @@ func (a *authSvc) IssueToken(ctx context.Context, userID string, userType models
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(opt.ttl)),
 			// TODO move string constant to config
-			Issuer:   "kickstart",
+			Issuer:   app,
 			ID:       tokenID,
 			Subject:  userID,
 			IssuedAt: jwt.NewNumericDate(time.Now()),
@@ -110,7 +112,7 @@ func (a *authSvc) ValidateToken(ctx context.Context, token string) (*models.Clai
 		return a.verifyKey, nil
 	}
 	claims := models.Claims{}
-	t, err := jwt.ParseWithClaims(token, &claims, keyFunc, jwt.WithIssuer("meetup.apen.tw"))
+	t, err := jwt.ParseWithClaims(token, &claims, keyFunc, jwt.WithIssuer(app))
 	if err != nil {
 		logging.Errorw(ctx, "parse jwt claims failed", "err", err, "token", token)
 		return nil, err

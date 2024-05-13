@@ -208,9 +208,58 @@
                     }
                 }
             }
+        },
+        "/token": {
+            "get": {
+                "description": "temporary token generator for testing which return a JWT once verified.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "order"
+                ],
+                "summary": "temporary token generator for testing",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID of user to get token of",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.GetTokenResp"
+                        }
+                    },
+                    "400": {
+                        "description": "cannot generate token",
+                        "schema": {
+                            "$ref": "#/definitions/api.errorResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.errorResp"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "api.GetTokenResp": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
         "api.errorResp": {
             "type": "object",
             "properties": {

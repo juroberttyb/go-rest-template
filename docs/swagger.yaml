@@ -1,5 +1,10 @@
 basePath: /
 definitions:
+  api.GetTokenResp:
+    properties:
+      token:
+        type: string
+    type: object
   api.errorResp:
     properties:
       error:
@@ -220,6 +225,33 @@ paths:
       security:
       - Bearer: []
       summary: Make a order
+      tags:
+      - order
+  /token:
+    get:
+      description: temporary token generator for testing which return a JWT once verified.
+      parameters:
+      - description: ID of user to get token of
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.GetTokenResp'
+        "400":
+          description: cannot generate token
+          schema:
+            $ref: '#/definitions/api.errorResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.errorResp'
+      summary: temporary token generator for testing
       tags:
       - order
 schemes:

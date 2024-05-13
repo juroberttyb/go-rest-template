@@ -50,7 +50,7 @@ type GetTokenResp struct {
 // @Tags		order
 // @Param		user_id	path	string	true	"ID of user to get token of"
 // @Produce		json
-// @Success		200	{object} 	loginResp
+// @Success		200	{object} 	GetTokenResp
 // @Failure		400	{object}	errorResp "cannot generate token"
 // @Failure		500	{object}	errorResp
 // @Router			/token [get]
