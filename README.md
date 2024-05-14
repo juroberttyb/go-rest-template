@@ -3,8 +3,13 @@ This repo implements a trade engine that accepts orders via the REST protocol.
 <br>
 An order request consists of these information (buy or sell, quantity, market price or limit price). 
 
+## Design
 
-## quickstart
+* this is a order based REST service
+* a order contains {action, price, quantity}
+* a user can {browse live orders, make order, take order, delete order}
+
+## Quickstart
 
 0. pre-requirement
 ```
@@ -32,7 +37,7 @@ $ make local-dev-down
 ## API DOC
 * Local Dev: http://localhost:8000/docs/index.html
 
-## package structure
+## Structure
 ```
 api -> service -> store -> implementations (database, encryption...)
  |        |         |         
@@ -44,6 +49,6 @@ api -> service -> store -> implementations (database, encryption...)
 * mutex should not only be on codebase level, but also should be on kubernete level to ensure no multitple pods modifying the orders at the same time
 * add user api group
 
-## todo
+## TODO
 * Update to use websocket instead of REST
 * Logging library should consider whether this is performance critical to change log format
