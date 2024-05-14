@@ -48,18 +48,18 @@ func (s *orderStore) GetLiveOrders(ctx context.Context, action models.OrderActio
 	values := []interface{}{
 		action,
 	}
-	query = query + strings.Join(conditions, " AND ") + " ORDER BY created_at DESC"
-
+	query = query + strings.Join(conditions, " AND ") + " ORDER BY "
 	switch action {
 	case models.Buy:
-		query = query + ", price ASC" // (latest order, highest price)
+		query = query + "price ASC" // (latest order, highest price)
 	case models.Sell:
-		query = query + ", price DESC" // (latest order, lowest price)
+		query = query + "price DESC" // (latest order, lowest price)
 	default:
 		err := errors.New("invalid order action")
 		logging.Errorw(ctx, "store get live orders failed", "err", err)
 		return nil, err
 	}
+	query += ", created_at DESC"
 
 	query = s.db.Rebind(query)
 	if err := s.db.Select(&orders, query, values...); err != nil {
@@ -120,7 +120,7 @@ func (s *orderStore) Take(ctx context.Context, action models.OrderAction, quanti
 		values := []interface{}{
 			models.Sell,
 		}
-		query = query + strings.Join(conditions, " AND ") + " ORDER BY created_at DESC, price ASC" // (latest order, lowest price)
+		query = query + strings.Join(conditions, " AND ") + " ORDER BY price ASC, created_at DESC" // (latest order, lowest price)
 
 		query = tx.Rebind(query)
 		if err := tx.Select(&orders, query, values...); err != nil {
