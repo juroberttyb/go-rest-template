@@ -1,5 +1,5 @@
-# tradebook
-This repo implements a trade engine that accepts orders via the REST protocol.
+# golang-rest-template
+This repo provides a simple golang rest template for developing different services, currently it implements a trade engine that accepts orders via the REST protocol.
 <br>
 An order request consists of these information (buy or sell, quantity, market price or limit price). 
 
