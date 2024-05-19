@@ -47,10 +47,7 @@ api -> service -> store -> implementations (database, encryption...)
  +----> models <----+
 ```
 
-## FIXME
-* mutex should not only be on codebase level, but also should be on kubernete level to ensure no multitple pods modifying the orders at the same time
-* add user api group
-
 ## TODO
-* Update to use websocket instead of REST
-* Logging library should consider whether this is performance critical to change log format
+* db query profiling
+* local tracing
+* aws
