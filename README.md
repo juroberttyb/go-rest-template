@@ -5,12 +5,6 @@ Currently, it implements a trade engine that accepts orders via the REST protoco
 <br>
 An order request consists of these information (buy or sell, quantity, market price or limit price). 
 
-## Design
-
-* this is a order based REST service
-* a order contains {action, price, quantity}
-* a user can {browse live orders, make order, take order, delete order}
-
 ## Quickstart
 
 0. pre-requirement
