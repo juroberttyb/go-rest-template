@@ -27,11 +27,9 @@ $ make run
 $ make local-dev-down
 ```
 
-## Resouce
-* [postman file](./tradebook.postman_collection.json) is included for trying the api out
-
 ## API DOC
-* Local Dev: http://localhost:8000/docs/index.html
+* Live Doc: http://localhost:8000/docs/index.html
+* [postman file](./tradebook.postman_collection.json) is included for trying the api out
 
 ## Structure
 ```
