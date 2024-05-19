@@ -1,9 +1,9 @@
 # golang-rest-template
-This repo provides a simple golang rest template for developing different services.
+This repo provides a simple golang rest template for developing microservices.
 <br>
-Currently, it implements a trade engine that accepts orders via the REST protocol for demo purpose.
+It implements a REST based tradebook service for demo purpose.
 <br>
-An order request consists of these information (buy or sell, quantity, market price or limit price). 
+An order in tradebook consists of these information (buy or sell, quantity, market price or limit price). 
 
 ## Quickstart
 
