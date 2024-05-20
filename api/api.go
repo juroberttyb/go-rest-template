@@ -41,17 +41,17 @@ func initializeRouter() *gin.Engine {
 	return router
 }
 
-// @title					Order (aka Broadcast Service) API
-// @description				This service provides message broadcasting service for official accounts,
-// @description				it also supports audience filtering and performance reporting.
-// @version					v1
-// @host					localhost:8000
-// @basePath					/
-// @schemes					http
-// @securityDefinitions.apiKey	Bearer
-// @in							header
-// @name						Authorization
-// @description				Type "Bearer" followed by a space and JWT.
+//	@title						Order (aka Broadcast Service) API
+//	@description				This service provides message broadcasting service for official accounts,
+//	@description				it also supports audience filtering and performance reporting.
+//	@version					v1
+//	@host						localhost:8000
+//	@basePath					/
+//	@schemes					http
+//	@securityDefinitions.apiKey	Bearer
+//	@in							header
+//	@name						Authorization
+//	@description				Type "Bearer" followed by a space and JWT.
 func createRouterAndGroup(prefix string) *gin.Engine {
 	ctx := context.Background()
 

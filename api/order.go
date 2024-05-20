@@ -45,15 +45,15 @@ type GetTokenResp struct {
 	Token string `json:"token"`
 }
 
-// @Summary		temporary token generator for testing
-// @Description	temporary token generator for testing which return a JWT once verified.
-// @Tags		order
-// @Param		user_id	path	string	true	"ID of user to get token of"
-// @Produce		json
-// @Success		200	{object} 	GetTokenResp
-// @Failure		400	{object}	errorResp "cannot generate token"
-// @Failure		500	{object}	errorResp
-// @Router			/token [get]
+//	@Summary		temporary token generator for testing
+//	@Description	temporary token generator for testing which return a JWT once verified.
+//	@Tags			order
+//	@Param			user_id	path	string	true	"ID of user to get token of"
+//	@Produce		json
+//	@Success		200	{object}	GetTokenResp
+//	@Failure		400	{object}	errorResp	"cannot generate token"
+//	@Failure		500	{object}	errorResp
+//	@Router			/token [get]
 func (h *orderHandler) getToken(ctx *gin.Context) {
 	p := GetTokenReq{}
 	if err := ctx.BindQuery(&p); err != nil {
@@ -79,15 +79,15 @@ type getOrdersReq struct {
 	BoardType models.OrderBoardType `form:"board_type" validate:"optional"`
 }
 
-// @Summary		Get a order board
-// @Description	Get a order board
-// @Tags			order
-// @Param			input	query	getOrdersReq	true	"related parameters"
-// @Produce		json
-// @Success		200	{object}	pageResp{data=[]models.Order}
-// @Failure		400	{object}	errorResp
-// @Failure		500	{object}	errorResp
-// @Router			/board [get]
+//	@Summary		Get a order board
+//	@Description	Get a order board
+//	@Tags			order
+//	@Param			input	query	getOrdersReq	true	"related parameters"
+//	@Produce		json
+//	@Success		200	{object}	pageResp{data=[]models.Order}
+//	@Failure		400	{object}	errorResp
+//	@Failure		500	{object}	errorResp
+//	@Router			/board [get]
 func (h *orderHandler) getBoard(ctx *gin.Context) {
 	p := getOrdersReq{}
 	if err := ctx.BindQuery(&p); err != nil {
@@ -117,16 +117,16 @@ type makeOrderBody struct {
 	Quantity int                `json:"quantity" binding:"required,min=1" example:"100"`
 }
 
-// @Summary		Make a order
-// @Description	Make a order
-// @Tags			order
-// @Param			jsonBody	body	makeOrderBody	true	"order id to attend and user's email"
-// @Produce		json
-// @Success		200
-// @Failure		400	{object}	errorResp
-// @Failure		500	{object}	errorResp
-// @Router			/orders/make [post]
-// @Security		Bearer
+//	@Summary		Make a order
+//	@Description	Make a order
+//	@Tags			order
+//	@Param			jsonBody	body	makeOrderBody	true	"order id to attend and user's email"
+//	@Produce		json
+//	@Success		200
+//	@Failure		400	{object}	errorResp
+//	@Failure		500	{object}	errorResp
+//	@Router			/orders/make [post]
+//	@Security		Bearer
 func (h *orderHandler) make(ctx *gin.Context) {
 	b := makeOrderBody{}
 	if err := ctx.BindJSON(&b); err != nil {
@@ -152,16 +152,16 @@ type takeOrderBody struct {
 	Quantity int                `json:"quantity" binding:"required,min=1" example:"100"`
 }
 
-// @Summary		Take a order
-// @Description	Take a order
-// @Tags			order
-// @Param			jsonBody	body	takeOrderBody	true	"order id to attend and user's email"
-// @Produce		json
-// @Success		200
-// @Failure		400	{object}	errorResp
-// @Failure		500	{object}	errorResp
-// @Router			/orders/take [patch]
-// @Security		Bearer
+//	@Summary		Take a order
+//	@Description	Take a order
+//	@Tags			order
+//	@Param			jsonBody	body	takeOrderBody	true	"order id to attend and user's email"
+//	@Produce		json
+//	@Success		200
+//	@Failure		400	{object}	errorResp
+//	@Failure		500	{object}	errorResp
+//	@Router			/orders/take [patch]
+//	@Security		Bearer
 func (h *orderHandler) take(ctx *gin.Context) {
 	b := takeOrderBody{}
 	if err := ctx.BindJSON(&b); err != nil {
@@ -184,16 +184,16 @@ type deleteOrderUri struct {
 	OrderID string `uri:"order_id" binding:"required,uuid4"`
 }
 
-// @Summary		Delete a order
-// @Description	Delete a order
-// @Tags			order
-// @Param		order_id	path	string	true	"ID of order"
-// @Produce		json
-// @Success		200
-// @Failure		400	{object}	errorResp
-// @Failure		500	{object}	errorResp
-// @Router			/orders [delete]
-// @Security		Bearer
+//	@Summary		Delete a order
+//	@Description	Delete a order
+//	@Tags			order
+//	@Param			order_id	path	string	true	"ID of order"
+//	@Produce		json
+//	@Success		200
+//	@Failure		400	{object}	errorResp
+//	@Failure		500	{object}	errorResp
+//	@Router			/orders [delete]
+//	@Security		Bearer
 func (h *orderHandler) delete(ctx *gin.Context) {
 	// FIXME: a order must only be deleted by the creator
 

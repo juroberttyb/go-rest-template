@@ -40,7 +40,7 @@ compose-down: ### Stop docker-compose
 	docker compose down
 
 doc: ### swag init # export PATH=$(go env GOPATH)/bin:$PATH, ref: https://github.com/swaggo/swag/issues/197
-	swag init -g api/api.go --parseDependency --parseInternal
+	swag fmt && swag init -g api/api.go --parseDependency --parseInternal
 
 deps:
 	go mod tidy
