@@ -1,4 +1,4 @@
-# golang-rest-template
+# go-rest-template
 This repo provides a simple golang rest template for developing microservices.
 <br>
 It implements a REST based tradebook service for demo purpose.
