@@ -41,5 +41,4 @@ api -> service -> store -> implementations (database, encryption...)
 
 ## TODO
 * db query profiling
-* local tracing
 * aws
