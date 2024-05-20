@@ -33,10 +33,10 @@ REGION=PROD_CLUSTER_REGION
 ${BINARY_NAME}:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /bin/${BINARY_NAME} -ldflags "$(LDFLAGS)" ./main.go
 
-local-dev-up: ### Run docker-compose
+compose-up: ### Run docker-compose
 	docker compose up -d --no-deps --build
 
-local-dev-down: ### Run docker-compose
+compose-down: ### Stop docker-compose
 	docker compose down
 
 doc: ### swag init # export PATH=$(go env GOPATH)/bin:$PATH, ref: https://github.com/swaggo/swag/issues/197

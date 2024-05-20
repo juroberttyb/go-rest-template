@@ -14,7 +14,7 @@ $ create a key on gcp cloud kms for this app and update SYSTEM_KEY_ID feild in .
 
 1. spin up local development environment
 ```
-$ make local-dev-up
+$ make compose-up
 ```
 
 2. start service for local development
@@ -24,7 +24,7 @@ $ make run
 
 3. (Optional) spin down local development environment
 ```
-$ make local-dev-down
+$ make compose-down
 ```
 
 ## API DOC
