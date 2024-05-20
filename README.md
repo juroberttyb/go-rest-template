@@ -27,6 +27,18 @@ $ make run
 $ make compose-down
 ```
 
+## Commit Requirements
+
+1. Build Document
+```
+$ make doc
+```
+
+2. Build Mocks
+```
+$ make mocks
+```
+
 ## API DOC
 * Live Doc: http://localhost:8000/docs/index.html
 * [postman file](./tradebook.postman_collection.json) is included for trying the api out
