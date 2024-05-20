@@ -38,7 +38,3 @@ api -> service -> store -> implementations (database, encryption...)
  |        V         |
  +----> models <----+
 ```
-
-## TODO
-* db query profiling
-* aws
