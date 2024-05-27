@@ -10,7 +10,6 @@ import (
 	"github.com/A-pen-app/kickstart/models"
 )
 
-// Chat defines all chatroom related operations
 type Order interface {
 	GetLiveOrders(ctx context.Context, action models.OrderAction) ([]*models.Order, error)
 	Make(ctx context.Context, action models.OrderAction, price, quantity int) error
