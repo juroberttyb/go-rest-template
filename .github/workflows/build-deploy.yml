@@ -34,6 +34,9 @@ jobs:
       - name: run server
         run: |
           screen -dm bash -c "make run;"
+      - name: Sleep for 5 seconds to ensure integration tests run only after db migration
+        run: sleep 5s
+        shell: bash
       - name: integration test
         run: |
           make integration-test
